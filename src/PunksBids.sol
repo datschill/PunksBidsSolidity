@@ -171,7 +171,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      * @dev Sets a new fee rate
      * @param _feeRate The new fee rate
      */
-     function setFeeRate(uint16 _feeRate) public onlyOwner {
+    function setFeeRate(uint16 _feeRate) public onlyOwner {
         feeRate = _feeRate;
 
         emit FeeRateUpdated(feeRate);
@@ -181,7 +181,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      * @dev Sets a new local fee rate
      * @param _localFeeRate The new fee rate
      */
-     function setLocalFeeRate(uint16 _localFeeRate) public onlyOwner {
+    function setLocalFeeRate(uint16 _localFeeRate) public onlyOwner {
         localFeeRate = _localFeeRate;
 
         emit LocalFeeRateUpdated(localFeeRate);
