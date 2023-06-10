@@ -84,7 +84,9 @@ contract Signature is Base {
             s: s
         });
 
-        vm.expectRevert("Invalid v parameter");
+        vm.expectRevert(
+            abi.encodeWithSelector(InvalidVParameter.selector, v)
+        );
         punksBids.validateSignature(input, bidHash);
     }
 }

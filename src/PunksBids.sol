@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "./lib/EIP712.sol";
+import "./lib/Errors.sol";
 import "./lib/StringUtils.sol";
 import "./interfaces/IWETH.sol";
 import "./interfaces/IPunksBids.sol";
@@ -13,19 +14,6 @@ import "./interfaces/ICryptoPunksMarket.sol";
 import "./interfaces/ICryptoPunksData.sol";
 
 import { Input, Bid } from "./lib/BidStructs.sol";
-
-/* Errors */
-error PunksBidsClosed();
-error InvalidBidParameters(Bid bid);
-error InvalidSignature(Input input);
-error SenderNotBidder(address sender, address bidder);
-error BidAlreadyCancelledOrFilled(Bid bid);
-error TransferToZeroAddress();
-error ETHTransferFailed(address recipient);
-error BuyPunkFailed(uint256 punkIndex);
-error TransferPunkFailed(uint256 punkIndex);
-error PunkNotSelected(uint256 punkIndex);
-error PunkExcluded(uint256 punkIndex);
 
 /**
 * @title PunksBids
@@ -302,7 +290,8 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
         bytes32 r,
         bytes32 s
     ) internal pure returns (bool) {
-        require(v == 27 || v == 28, "Invalid v parameter");
+        if (v != 27 && v != 28)
+            revert InvalidVParameter(v);
         address recoveredSigner = ecrecover(digest, v, r, s);
         if (recoveredSigner == address(0)) {
           return false;
@@ -323,7 +312,8 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
     {
         (price, punkPrice, seller) = _canBuyPunk(bid, punkIndex);
 
-        require(_validatePunkIndex(bid, uint16(punkIndex)), "Invalid Punk index");
+        if (!_validatePunkIndex(bid, uint16(punkIndex)))
+            revert InvalidPunkIndex(punkIndex);
 
         /* Retrieve Punk attributes */
         string memory punkAttributesString = ICryptoPunksData(CRYPTOPUNKS_DATA).punkAttributes(uint16(punkIndex));
@@ -332,13 +322,16 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
         /* Checks Punk base type. */
         if (bytes(bid.baseType).length > 0) {
             StringUtils.slice memory punkBaseType = punkAttributes[0];
-            require(punkBaseType.contains(bid.baseType.toSlice()), "Invalid Punk base type");
+            if (!punkBaseType.contains(bid.baseType.toSlice()))
+                revert InvalidPunkBaseType();
         }
 
         /* Checks attributes count. */
         if (bid.attributesCountEnabled) {
             /* -1 to take account of base type. */
-            require(punkAttributes.length - 1 == bid.attributesCount, "Invalid attributes count");
+            uint8 punkAttributesCount = uint8(punkAttributes.length - 1);
+            if (punkAttributesCount != bid.attributesCount)
+                revert InvalidPunkAttributesCount(punkAttributesCount, bid.attributesCount);
         }
         
         /* Compare Bid attributes with Punk attributes. */
@@ -362,8 +355,8 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
                 }
 
                 // PASHOV QUESTION : Remove attributeOffset ? More gas efficient -> but can lead to errors (non matching) if bids aren't properly sorted offchain
-
-                require(hasAttribute, "Mandatory attribute missing");
+                if (!hasAttribute)
+                    revert PunkMissingAttributes();
             }
         }
 
@@ -388,13 +381,16 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
             address onlySellTo
         ) = ICryptoPunksMarket(CRYPTOPUNKS_MARKETPLACE).punksOfferedForSale(punkIndex);
 
-        require(isForSale, "Punk not for sale");
-        require(onlySellTo == address(0) || onlySellTo == address(this), "Not allowed to buy this Punk");
+        if (!isForSale)
+            revert PunkNotForSale(punkIndex);
+        if (onlySellTo != address(0) && onlySellTo != address(this))
+            revert PunkNotGloballyForSale(punkIndex, onlySellTo);
 
         uint16 currentFeeRate = onlySellTo == address(this) ? localFeeRate : feeRate;
         uint256 price = INVERSE_BASIS_POINT * punkPrice / (INVERSE_BASIS_POINT - currentFeeRate);
 
-        require(price <= bid.amount, "Insufficient Bid amount");
+        if (price > bid.amount)
+            revert BidAmountTooLow(price, bid.amount);
 
         return (price, punkPrice, seller);
     }
@@ -416,13 +412,13 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
                     return true;
                 }
             }
-            revert PunkNotSelected({punkIndex: punkIndex});
+            revert PunkNotSelected(punkIndex);
         }
 
         if (bid.excludedIndexes.length > 0) {
             for (uint i=0; i < bid.excludedIndexes.length; i++) {
                 if (punkIndex == bid.excludedIndexes[i]) {
-                    revert PunkExcluded({punkIndex: punkIndex});
+                    revert PunkExcluded(punkIndex);
                 }
             }
         }
@@ -458,11 +454,11 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
         internal
     {
         try ICryptoPunksMarket(CRYPTOPUNKS_MARKETPLACE).buyPunk{value: punkPrice}(punkIndex) {} catch {
-            revert BuyPunkFailed({punkIndex: punkIndex});
+            revert BuyPunkFailed(punkIndex);
         }
 
         try ICryptoPunksMarket(CRYPTOPUNKS_MARKETPLACE).transferPunk(bidder, punkIndex) {} catch {
-            revert TransferPunkFailed({punkIndex: punkIndex});
+            revert TransferPunkFailed(punkIndex);
         }
     }
 

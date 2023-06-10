@@ -65,6 +65,8 @@ contract CanMatchBidAndPunk is Base {
         punksMarketPlace.offerPunkForSale(punkIndex, defaultPunkPrice);
     }
 
+    // TODO : add test for InvalidPunkIndex
+
     function _canBuyPunk(Bid memory _bid, uint256 _punkIndex) internal {
         ( 
             bool isForSale,
@@ -112,7 +114,9 @@ contract CanMatchBidAndPunk is Base {
     }
 
     function testCannotBuyPunkNotForSale() public {
-        vm.expectRevert("Punk not for sale");
+        vm.expectRevert(
+            abi.encodeWithSelector(PunkNotForSale.selector, notForSalePunkIndex)
+        );
         punksBids.canBuyPunk(bid, notForSalePunkIndex);
     }
 
@@ -121,16 +125,22 @@ contract CanMatchBidAndPunk is Base {
         vm.prank(forSalePunkAddress);
         punksMarketPlace.offerPunkForSaleToAddress(forSalePunkIndex, defaultPunkPrice, dada);
 
-        vm.expectRevert("Not allowed to buy this Punk");
+        vm.expectRevert(
+            abi.encodeWithSelector(PunkNotGloballyForSale.selector, forSalePunkIndex, dada)
+        );
         punksBids.canBuyPunk(bid, forSalePunkIndex);
     }
 
     function testCannotSetBidAmountTooLow(uint256 bidAmount) public {
         bidAmount = bound(bidAmount, 1, defaultPunkPrice);
-        // Amount <= punkPrice (don't take account of fees)
-        bid.amount = bidAmount;
 
-        vm.expectRevert("Insufficient Bid amount");
+        uint256 finalPrice = punksBids.getFinalPrice(defaultPunkPrice, false);
+        // Bid Amount < finalPrice (don't take account of fees)
+        bid.amount = finalPrice - 1;
+
+        vm.expectRevert(
+            abi.encodeWithSelector(BidAmountTooLow.selector, finalPrice, bid.amount)
+        );
         punksBids.canBuyPunk(bid, forSalePunkIndex);
     }
 
@@ -182,7 +192,7 @@ contract CanMatchBidAndPunk is Base {
         
         bid.baseType = baseType;
 
-        vm.expectRevert("Invalid Punk base type");
+        vm.expectRevert(InvalidPunkBaseType.selector);
         punksBids.canMatchBidAndPunk(bid, alienPunkIndex);
     }
 
@@ -198,7 +208,9 @@ contract CanMatchBidAndPunk is Base {
         bid.attributesCountEnabled = true;
         bid.attributesCount = attributesCount;
 
-        vm.expectRevert("Invalid attributes count");
+        vm.expectRevert(
+            abi.encodeWithSelector(InvalidPunkAttributesCount.selector, 3, attributesCount)
+        );
         punksBids.canMatchBidAndPunk(bid, threeAttributesPunkIndex);
     }
 
@@ -217,7 +229,7 @@ contract CanMatchBidAndPunk is Base {
     function testCannotMatchBidAndPunkIfPunkDoesntHaveAttributes() public {
         bid.attributes = uniquePunkAttributes;
 
-        vm.expectRevert("Mandatory attribute missing");
+        vm.expectRevert(PunkMissingAttributes.selector);
         punksBids.canMatchBidAndPunk(bid, alienPunkIndex);
     }
 
@@ -231,7 +243,7 @@ contract CanMatchBidAndPunk is Base {
     //     vm.prank(punkAddress);
     //     punksMarketPlace.offerPunkForSale(punkIndex, defaultPunkPrice);
 
-    //     vm.expectRevert("Mandatory attribute missing");
+    //     vm.expectRevert(PunkMissingAttributes.selector);
     //     punksBids.canMatchBidAndPunk(bid, punkIndex);
     // }
 }
