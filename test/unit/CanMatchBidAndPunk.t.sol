@@ -65,8 +65,6 @@ contract CanMatchBidAndPunk is Base {
         punksMarketPlace.offerPunkForSale(punkIndex, defaultPunkPrice);
     }
 
-    // TODO : add test for InvalidPunkIndex
-
     function _canBuyPunk(Bid memory _bid, uint256 _punkIndex) internal {
         ( 
             bool isForSale,
@@ -184,6 +182,21 @@ contract CanMatchBidAndPunk is Base {
         bool isValidPunkIndex = punksBids.validatePunkIndex(bid, punkIndex);
 
         assertEq(isValidPunkIndex, false, "Punk index should fit with modulo");
+    }
+
+    function testCannotValidatePunkIndex(uint16 punkIndex, uint16 maxIndex) public {
+        vm.assume(maxIndex > 0);
+        vm.assume(punkIndex > maxIndex);
+        vm.assume(punkIndex <= 9999);
+
+        bid.maxIndex = maxIndex;
+
+        _offerPunkForSale(punkIndex);
+
+        vm.expectRevert(
+            abi.encodeWithSelector(InvalidPunkIndex.selector, punkIndex)
+        );
+        punksBids.canMatchBidAndPunk(bid, punkIndex);
     }
 
     function testCannotMatchBidAndPunkIfBaseTypeDoesntMatch(uint8 baseTypeIndex) public {

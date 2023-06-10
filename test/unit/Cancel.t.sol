@@ -67,7 +67,9 @@ contract Cancel is Base {
         vm.stopPrank();
     }
 
-    // TODO : testCannotCancelBidExecuted
+    function testCannotCancelBidExecuted() public {
+        // TODO : testCannotCancelBidExecuted
+    }
 
     function testEmitBidCancelled() public {
         vm.startPrank(coco);

@@ -51,8 +51,6 @@ contract BuyPunk is Base {
         seller = _offerPunkForSale(punkIndex, defaultPunkPrice, false);
     }
 
-    // TODO : Add tests for InvalidBidParameters and InvalidSignature
-
     function _offerPunkForSale(uint256 punkIndex, uint256 price, bool isLocal) internal returns (address seller) {
         address toAddress = isLocal ? address(punksBids) : address(0);
         seller = punksMarketPlace.punkIndexToAddress(punkIndex);
@@ -100,6 +98,35 @@ contract BuyPunk is Base {
         uint256 balanceAfter = address(punksBids).balance;
 
         assertEq(balanceAfter, balanceBefore + fees, "PunksBids should have earned the right amount of local fees");
+    }
+
+    function testCannotValidateBidParameters() public {
+        // Invalid bid parameter
+        input.bid.bidder = address(0);
+
+        vm.expectRevert(
+            abi.encodeWithSelector(InvalidBidParameters.selector, input.bid)
+        );
+        punksBids.executeMatch(input, punkIndex);
+    }
+
+    function testCannotValidateSignature() public {
+        bytes32 bidHash = punksBids.hashBid(bid, nonce);
+        bytes32 bidHashToSign = punksBids.hashToSign(bidHash);
+        // Signer != Bidder
+        (uint8 v, bytes32 r, bytes32 s) = signHash(dadaPK, bidHashToSign);
+
+        input = Input({
+            bid: bid,
+            v: v,
+            r: r,
+            s: s
+        });
+        
+        vm.expectRevert(
+            abi.encodeWithSelector(InvalidSignature.selector, input)
+        );
+        punksBids.executeMatch(input, punkIndex);
     }
 
     function testEmitBidMatched() public {
