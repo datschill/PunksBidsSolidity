@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity 0.8.19;
 
 interface ICryptoPunksMarket {
     function buyPunk(uint256 punkIndex) external payable;
@@ -22,6 +22,7 @@ interface ICryptoPunksMarket {
             address onlySellTo
         );
 
+    // Only used in tests
     function punkNoLongerForSale(uint punkIndex) external;
 
     function offerPunkForSale(uint punkIndex, uint minSalePriceInWei) external;
