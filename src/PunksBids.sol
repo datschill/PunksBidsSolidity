@@ -14,6 +14,19 @@ import "./interfaces/ICryptoPunksData.sol";
 
 import { Input, Bid } from "./lib/BidStructs.sol";
 
+/* Errors */
+error PunksBidsClosed();
+error InvalidBidParameters(Bid bid);
+error InvalidSignature(Input input);
+error SenderNotBidder(address sender, address bidder);
+error BidAlreadyCancelledOrFilled(Bid bid);
+error TransferToZeroAddress();
+error ETHTransferFailed(address recipient);
+error BuyPunkFailed(uint256 punkIndex);
+error TransferPunkFailed(uint256 punkIndex);
+error PunkNotSelected(uint256 punkIndex);
+error PunkExcluded(uint256 punkIndex);
+
 /**
 * @title PunksBids
 * @author 0xd0s.eth
@@ -28,7 +41,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
     uint256 public isOpen;
 
     modifier whenOpen() {
-        require(isOpen == 1, "Closed");
+        if (isOpen != 1) revert PunksBidsClosed();
         _;
     }
 
@@ -78,12 +91,6 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
     event FeeRateUpdated(uint16 feeRate);
     event LocalFeeRateUpdated(uint16 localFeeRate);
 
-    /* Errors */
-    error BuyPunkFailed(uint256 punkIndex);
-    error TransferPunkFailed(uint256 punkIndex);
-    error PunkNotSelected(uint256 punkIndex);
-    error PunkExcluded(uint256 punkIndex);
-
     constructor() {
         isOpen = 1;
 
@@ -110,9 +117,11 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
     {
         bytes32 bidHash = _hashBid(buy.bid, nonces[buy.bid.bidder]);
 
-        require(_validateBidParameters(buy.bid, bidHash), "Buy has invalid parameters");
+        if (!_validateBidParameters(buy.bid, bidHash))
+            revert InvalidBidParameters(buy.bid);
 
-        require(_validateSignature(buy, bidHash), "Buy failed authorization");
+        if (!_validateSignature(buy, bidHash))
+            revert InvalidSignature(buy);
 
         (uint256 price, uint256 punkPrice, address seller) = _canMatchBidAndPunk(buy.bid, punkIndex);
 
@@ -138,11 +147,13 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      */
     function cancelBid(Bid calldata bid) public {
         /* Assert sender is authorized to cancel order. */
-        require(msg.sender == bid.bidder, "Not sent by bidder");
+        if (msg.sender != bid.bidder)
+            revert SenderNotBidder(msg.sender, bid.bidder);
 
         bytes32 hash = _hashBid(bid, nonces[bid.bidder]);
 
-        require(!cancelledOrFilled[hash], "Bid cancelled or filled");
+        if (cancelledOrFilled[hash])
+            revert BidAlreadyCancelledOrFilled(bid);
 
         /* Mark bid as cancelled, preventing it from being matched. */
         cancelledOrFilled[hash] = true;
@@ -192,10 +203,12 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      * @param recipient The recipient of the fees
      */
     function withdrawFees(address recipient) external onlyOwner {
-        require(recipient != address(0), "Transfer to zero address");
+        if (recipient == address(0))
+            revert TransferToZeroAddress();
         uint256 amount = address(this).balance;
         (bool success,) = payable(recipient).call{value: amount}("");
-        require(success, "ETH transfer failed");
+        if (!success)
+            revert ETHTransferFailed(recipient);
 
         emit FeesWithdrawn(recipient, amount);
     }
@@ -451,10 +464,6 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
         try ICryptoPunksMarket(CRYPTOPUNKS_MARKETPLACE).transferPunk(bidder, punkIndex) {} catch {
             revert TransferPunkFailed({punkIndex: punkIndex});
         }
-
-        // PASHOV QUESTION : Handle external calls like this ?
-        // (bool result,) = punkContract.call(abi.encodeWithSignature("transferPunk(address,uint256)", _owner, punkIndex));
-        // require(result, "TransferPunkFailed");
     }
 
     /**

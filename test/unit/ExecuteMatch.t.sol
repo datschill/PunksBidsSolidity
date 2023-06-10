@@ -51,11 +51,21 @@ contract BuyPunk is Base {
         seller = _offerPunkForSale(punkIndex, defaultPunkPrice, false);
     }
 
+    // TODO : Add tests for InvalidBidParameters and InvalidSignature
+
     function _offerPunkForSale(uint256 punkIndex, uint256 price, bool isLocal) internal returns (address seller) {
         address toAddress = isLocal ? address(punksBids) : address(0);
         seller = punksMarketPlace.punkIndexToAddress(punkIndex);
         vm.prank(seller);
         punksMarketPlace.offerPunkForSaleToAddress(punkIndex, price, toAddress);
+    }
+
+    // open/close
+    function testCannotExecuteIfClosed() public {
+        punksBids.close();
+
+        vm.expectRevert(PunksBidsClosed.selector);
+        punksBids.executeMatch(input, punkIndex);
     }
 
     // executeMatch

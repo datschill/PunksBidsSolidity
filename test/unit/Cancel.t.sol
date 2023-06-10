@@ -50,7 +50,9 @@ contract Cancel is Base {
     }
 
     function testCannotCancelBid() public {
-        vm.expectRevert("Not sent by bidder");
+        vm.expectRevert(
+            abi.encodeWithSelector(SenderNotBidder.selector, address(this), bidCoco.bidder)
+        );
         punksBids.cancelBid(bidCoco);
     }
 
@@ -58,7 +60,9 @@ contract Cancel is Base {
         vm.startPrank(coco);
         punksBids.cancelBid(bidCoco);
 
-        vm.expectRevert("Bid cancelled or filled");
+        vm.expectRevert(
+            abi.encodeWithSelector(BidAlreadyCancelledOrFilled.selector, bidCoco)
+        );
         punksBids.cancelBid(bidCoco);
         vm.stopPrank();
     }
@@ -85,7 +89,9 @@ contract Cancel is Base {
     }
 
     function testCannotCancelBids() public {
-        vm.expectRevert("Not sent by bidder");
+        vm.expectRevert(
+            abi.encodeWithSelector(SenderNotBidder.selector, address(this), bids[0].bidder)
+        );
         punksBids.cancelBids(bids);
     }
 

@@ -55,7 +55,7 @@ contract Fees is Base {
 
     // withdrawFees
     function testCannotWithdrawToNullAddress() public {
-        vm.expectRevert("Transfer to zero address");
+        vm.expectRevert(TransferToZeroAddress.selector);
         punksBids.withdrawFees(address(0));
     }
 
