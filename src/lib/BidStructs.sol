@@ -35,6 +35,13 @@ struct Bid {
     uint256 nonce;
 }
 
+/**
+* @dev Input struct to link a Bid and its signature
+* @custom:bid Bid
+* @custom:v v of the signature
+* @custom:r r of the signature
+* @custom:s s of the signature
+*/
 struct Input {
     Bid bid;
     uint8 v;

@@ -75,6 +75,16 @@ contract BuyPunk is Base {
         assertEq(filled, true, "Bid should be flagged as filled");
     }
 
+    function testCannotCancelFilledBid() public {
+        punksBids.executeMatch(input, punkIndex);
+
+        vm.startPrank(input.bid.bidder);
+        vm.expectRevert(
+            abi.encodeWithSelector(BidAlreadyCancelledOrFilled.selector, input.bid)
+        );
+        punksBids.cancelBid(input.bid);
+    }
+
     function testShouldHaveEarnedFees() public {
         uint256 finalPrice = punksBids.getFinalPrice(defaultPunkPrice, false);
         uint256 fees = finalPrice - defaultPunkPrice;
