@@ -4,8 +4,6 @@ pragma solidity 0.8.19;
 import "../Base.t.sol";
 
 contract BuyPunk is Base {
-    error BuyPunkFailed(uint256 punkIndex);
-
     ICryptoPunksMarket public punksMarketPlace;
 
     uint256 public defaultPunkPrice = 0xffffffffffff;

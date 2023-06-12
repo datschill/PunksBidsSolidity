@@ -51,11 +51,12 @@ contract BuyPunk is Base {
         seller = _offerPunkForSale(punkIndex, defaultPunkPrice, false);
     }
 
-    function _offerPunkForSale(uint256 punkIndex, uint256 price, bool isLocal) internal returns (address seller) {
+    function _offerPunkForSale(uint256 _punkIndex, uint256 price, bool isLocal) internal returns (address) {
         address toAddress = isLocal ? address(punksBids) : address(0);
-        seller = punksMarketPlace.punkIndexToAddress(punkIndex);
+        seller = punksMarketPlace.punkIndexToAddress(_punkIndex);
         vm.prank(seller);
-        punksMarketPlace.offerPunkForSaleToAddress(punkIndex, price, toAddress);
+        punksMarketPlace.offerPunkForSaleToAddress(_punkIndex, price, toAddress);
+        return seller;
     }
 
     // open/close
@@ -121,8 +122,8 @@ contract BuyPunk is Base {
     }
 
     function testCannotValidateSignature() public {
-        bytes32 bidHash = punksBids.hashBid(bid, nonce);
-        bytes32 bidHashToSign = punksBids.hashToSign(bidHash);
+        bidHash = punksBids.hashBid(bid, nonce);
+        bidHashToSign = punksBids.hashToSign(bidHash);
         // Signer != Bidder
         (uint8 v, bytes32 r, bytes32 s) = signHash(dadaPK, bidHashToSign);
 

@@ -39,7 +39,7 @@ contract TestPunksBids is PunksBids {
 
     function validatePunkIndex(Bid calldata bid, uint16 punkIndex)
         public
-        view
+        pure
         returns (bool)
     {
         return _validatePunkIndex(bid, punkIndex);
@@ -59,7 +59,7 @@ contract TestPunksBids is PunksBids {
 
     function hashBid(Bid memory bid, uint256 nonce)
         public
-        view
+        pure
         returns (bytes32)
     {
         return _hashBid(bid, nonce);

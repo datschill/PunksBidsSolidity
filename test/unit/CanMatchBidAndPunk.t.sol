@@ -4,9 +4,6 @@ pragma solidity 0.8.19;
 import "../Base.t.sol";
 
 contract CanMatchBidAndPunk is Base {
-    error PunkNotSelected(uint256 punkIndex);
-    error PunkExcluded(uint256 punkIndex);
-
     uint256 public notForSalePunkIndex = 666;
     address public notForSalePunkAddress;
     uint256 public forSalePunkIndex = 888;
@@ -67,7 +64,7 @@ contract CanMatchBidAndPunk is Base {
 
     function _canBuyPunk(Bid memory _bid, uint256 _punkIndex) internal {
         ( 
-            bool isForSale,
+            ,
             ,
             address pSeller,
             uint256 pPrice,
@@ -87,7 +84,7 @@ contract CanMatchBidAndPunk is Base {
     
     function _canMatchBidAndPunk(Bid memory _bid, uint256 _punkIndex) internal {
         ( 
-            bool isForSale,
+            ,
             ,
             address pSeller,
             uint256 pPrice,
