@@ -57,10 +57,8 @@ contract EIP712 {
                     bid.attributesCount,
                     bid.modulo,
                     bid.maxIndex,
-                    keccak256(abi.encodePacked(bid.indexes)),
-                    keccak256(abi.encodePacked(bid.excludedIndexes)),
-                    keccak256(abi.encodePacked(bid.baseType)),
-                    keccak256(abi.encodePacked(bid.attributes)),
+                    _hashIndexes(bid),
+                    _hashAttributes(bid),
                     bid.amount,
                     bid.listingTime,
                     bid.expirationTime,
@@ -69,6 +67,28 @@ contract EIP712 {
                 abi.encode(nonce)
             )
         );
+    }
+
+    function _hashIndexes(Bid memory bid)
+        internal
+        pure
+        returns (bytes32)
+    {
+        return keccak256(abi.encodePacked(
+            keccak256(abi.encodePacked(bid.indexes)),
+            keccak256(abi.encodePacked(bid.excludedIndexes))
+        ));
+    }
+
+    function _hashAttributes(Bid memory bid)
+        internal
+        pure
+        returns (bytes32)
+    {
+        return keccak256(abi.encodePacked(
+            keccak256(abi.encodePacked(bid.baseType)),
+            keccak256(abi.encodePacked(bid.attributes))
+        ));
     }
 
     function _hashToSign(bytes32 bidHash)

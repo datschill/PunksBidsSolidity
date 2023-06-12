@@ -4,6 +4,8 @@ pragma solidity 0.8.19;
 import "../Base.t.sol";
 
 contract Fees is Base {
+    event Opened();
+    event Closed();
     event FeesWithdrawn(address indexed recipient, uint256 amount);
     event FeeRateUpdated(uint16 feeRate);
     event LocalFeeRateUpdated(uint16 localFeeRate);
@@ -13,6 +15,23 @@ contract Fees is Base {
         vm.deal(address(this), 100 ether);
         // Give PunksBids contract 100 ETH
         vm.deal(address(punksBids), 100 ether);
+    }
+
+    // open/close
+    function testOpen() public {
+        vm.expectEmit(false, false, false, true);
+        emit Opened();
+        punksBids.open();
+
+        assertEq(punksBids.isOpen(), 1, "PunksBids should be open");
+    }
+
+    function testClose() public {
+        vm.expectEmit(false, false, false, true);
+        emit Closed();
+        punksBids.close();
+
+        assertEq(punksBids.isOpen(), 0, "PunksBids should be closed");
     }
 
     // setFeeRate
@@ -57,6 +76,13 @@ contract Fees is Base {
     function testCannotWithdrawToNullAddress() public {
         vm.expectRevert(TransferToZeroAddress.selector);
         punksBids.withdrawFees(address(0));
+    }
+
+    function testCannotWithdrawToNonPayableAddress() public {
+        vm.expectRevert(
+            abi.encodeWithSelector(ETHTransferFailed.selector, address(revertFallback))
+        );
+        punksBids.withdrawFees(address(revertFallback));
     }
 
     function testCannotWithdrawFees() public {

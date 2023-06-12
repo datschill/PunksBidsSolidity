@@ -4,6 +4,7 @@ pragma solidity 0.8.19;
 import "forge-std/Test.sol";
 import "forge-std/console2.sol";
 
+import "src/test/RevertFallback.sol";
 import "src/test/TestPunksBids.sol";
 
 import "src/interfaces/IWETH.sol";
@@ -14,6 +15,7 @@ import { Bid } from "src/lib/BidStructs.sol";
 contract Base is EIP712, Test {
     using console for *;
 
+    RevertFallback internal revertFallback;
     TestPunksBids internal punksBids;
 
     address weth;
@@ -25,6 +27,7 @@ contract Base is EIP712, Test {
     address internal deployer;
 
     constructor() {
+        revertFallback = new RevertFallback();
         punksBids = new TestPunksBids();
         string memory NAME = punksBids.NAME();
         string memory VERSION = punksBids.VERSION();

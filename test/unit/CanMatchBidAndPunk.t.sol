@@ -140,6 +140,19 @@ contract CanMatchBidAndPunk is Base {
     }
 
     //_validatePunkIndex
+    function testValidatePunkIfInIndexesList(uint16 punkIndex) public {
+        bid.indexes.push(punkIndex);
+
+        assertEq(punksBids.validatePunkIndex(bid, punkIndex), true, "Punk index could be in indexes list");
+    }
+
+    function testValidatePunkIfNotInExcludedIndexesList(uint16 punkIndex, uint16 excludedPunkIndex) public {
+        vm.assume(punkIndex != excludedPunkIndex);
+        bid.excludedIndexes.push(excludedPunkIndex);
+
+        assertEq(punksBids.validatePunkIndex(bid, punkIndex), true, "Punk index is valid if not excluded");
+    }
+
     function testCannotBuyPunkIfIndexNotInIndexesList(uint16 punkIndex, uint16 selectedPunkIndex) public {
         bid.indexes.push(selectedPunkIndex);
         vm.assume(punkIndex != selectedPunkIndex);
@@ -222,6 +235,13 @@ contract CanMatchBidAndPunk is Base {
             abi.encodeWithSelector(InvalidPunkAttributesCount.selector, 3, attributesCount)
         );
         punksBids.canMatchBidAndPunk(bid, threeAttributesPunkIndex);
+    }
+
+    function testMatchBidAndPunkIfAttributesCountIsCorrect() public {
+        bid.attributesCountEnabled = true;
+        bid.attributesCount = 3;
+
+        _canMatchBidAndPunk(bid, threeAttributesPunkIndex);
     }
 
     function testMatchBidAndPunkIfAttributesCountNotEnabled(uint8 attributesCount) public {

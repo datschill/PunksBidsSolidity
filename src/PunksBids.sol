@@ -472,11 +472,11 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
         pure
         returns (StringUtils.slice[] memory)
     {
-        StringUtils.slice memory s = arrayString.toSlice();                
+        StringUtils.slice memory s = arrayString.toSlice();
         StringUtils.slice memory delim = separator.toSlice();
-        StringUtils.slice[] memory parts = new StringUtils.slice[](s.count(delim) + 1);      
-        for (uint i = 0; i < parts.length; i++) {                              
-           parts[i] = s.split(delim);                    
+        StringUtils.slice[] memory parts = new StringUtils.slice[](s.count(delim) + 1);
+        for (uint i = 0; i < parts.length; i++) {
+           parts[i] = s.split(delim);
         }
         return parts;
     }
