@@ -7,8 +7,9 @@ import "forge-std/console2.sol";
 import "src/test/RevertFallback.sol";
 import "src/test/TestPunksBids.sol";
 
+import "src/test/interfaces/ITestCryptoPunksMarket.sol";
+
 import "src/interfaces/IWETH.sol";
-import "src/interfaces/ICryptoPunksMarket.sol";
 
 import { Bid } from "src/lib/BidStructs.sol";
 
@@ -17,6 +18,7 @@ contract Base is EIP712, Test {
 
     RevertFallback internal revertFallback;
     TestPunksBids internal punksBids;
+    ITestCryptoPunksMarket public punksMarketPlace;
 
     address weth;
     uint internal cocoPK;
@@ -25,10 +27,13 @@ contract Base is EIP712, Test {
     address internal dada;
     uint internal deployerPK;
     address internal deployer;
+    
+    uint256 public defaultPunkPrice = 0xffffffffffff;
 
     constructor() {
         revertFallback = new RevertFallback();
         punksBids = new TestPunksBids();
+        punksMarketPlace = ITestCryptoPunksMarket(punksBids.CRYPTOPUNKS_MARKETPLACE());
         string memory NAME = punksBids.NAME();
         string memory VERSION = punksBids.VERSION();
         weth = punksBids.WETH();

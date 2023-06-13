@@ -4,13 +4,8 @@ pragma solidity 0.8.19;
 import "../Base.t.sol";
 
 contract BuyPunk is Base {
-    ICryptoPunksMarket public punksMarketPlace;
-
-    uint256 public defaultPunkPrice = 0xffffffffffff;
 
     function setUp() public {
-        punksMarketPlace = ICryptoPunksMarket(punksBids.CRYPTOPUNKS_MARKETPLACE());
-
         deal(address(punksBids), defaultPunkPrice);
     }
 

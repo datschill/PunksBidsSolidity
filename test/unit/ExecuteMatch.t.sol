@@ -12,8 +12,6 @@ contract BuyPunk is Base {
         bytes32 bidHash
     );
 
-    ICryptoPunksMarket public punksMarketPlace;
-
     uint256 public nonce;
     Bid public bid;
     bytes32 public bidHash;
@@ -22,11 +20,8 @@ contract BuyPunk is Base {
 
     uint256 punkIndex = 1234;
     address seller;
-    uint256 public defaultPunkPrice = 0xffffffffffff;
 
     function setUp() public {
-        punksMarketPlace = ICryptoPunksMarket(punksBids.CRYPTOPUNKS_MARKETPLACE());
-
         bid = defaultBid();
         bid.bidder = coco;
         bid.amount = 2 * defaultPunkPrice; // Take account of fees

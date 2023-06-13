@@ -24,16 +24,10 @@ contract CanMatchBidAndPunk is Base {
 
     string[] public baseTypes = ["Male", "Female", "Zombie", "Ape", "Alien"];
 
-    uint256 public defaultPunkPrice = 0xffffffffff;
-
-    ICryptoPunksMarket public punksMarketPlace;
-
     Bid public bid;
 
     function setUp() public {
         bid = defaultBid();
-
-        punksMarketPlace = ICryptoPunksMarket(punksBids.CRYPTOPUNKS_MARKETPLACE());
 
         // Init Punk not for sale
         notForSalePunkAddress = punksMarketPlace.punkIndexToAddress(notForSalePunkIndex);

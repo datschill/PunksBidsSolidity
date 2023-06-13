@@ -38,26 +38,4 @@ interface ICryptoPunksMarket {
             uint256 minValue,
             address onlySellTo
         );
-
-    // Only used in tests
-    /**
-     * @dev Remove a Punk from sale
-     * @param punkIndex Punk Index
-     */
-    function punkNoLongerForSale(uint punkIndex) external;
-
-    /**
-     * @dev Offer a Punk for sale
-     * @param punkIndex Punk Index
-     * @param minSalePriceInWei Minimum price in wei
-     */
-    function offerPunkForSale(uint punkIndex, uint minSalePriceInWei) external;
-
-    /**
-     * @dev Offer a Punk for sale, to a specific address
-     * @param punkIndex Punk Index
-     * @param minSalePriceInWei Minimum price in wei
-     * @param toAddress The only address allowed to buy the Punk
-     */
-    function offerPunkForSaleToAddress(uint punkIndex, uint minSalePriceInWei, address toAddress) external;
 }
