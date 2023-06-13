@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
@@ -21,7 +21,7 @@ import {Input, Bid} from "./lib/BidStructs.sol";
  * @notice Allows bidding with WETH on specific CryptoPunks or attributes
  * @dev Lot of lines of code were taken from the Blur Marketplace, as a source of trust and good architecture example
  */
-contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
+contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
     using SafeERC20 for IWETH;
     using StringUtils for *;
 
