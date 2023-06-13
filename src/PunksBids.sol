@@ -52,6 +52,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
     address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     address public constant CRYPTOPUNKS_MARKETPLACE = 0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB;
     address public constant CRYPTOPUNKS_DATA = 0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2;
+    string public constant ATTRIBUTES_SEPARATOR = ", ";
 
     /* Storage */
     mapping(bytes32 => bool) public cancelledOrFilled;
@@ -317,7 +318,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
 
         /* Retrieve Punk attributes */
         string memory punkAttributesString = ICryptoPunksData(CRYPTOPUNKS_DATA).punkAttributes(uint16(punkIndex));
-        StringUtils.slice[] memory punkAttributes = _getAttributesStringToSliceArray(punkAttributesString, ", ");
+        StringUtils.slice[] memory punkAttributes = _getAttributesStringToSliceArray(punkAttributesString);
 
         /* Checks Punk base type. */
         if (bytes(bid.baseType).length > 0) {
@@ -338,7 +339,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
         if (bytes(bid.attributes).length > 0) {
             StringUtils.slice memory currentBidAttribute = ''.toSlice();
             StringUtils.slice memory currentPunkAttribute = ''.toSlice();
-            StringUtils.slice[] memory bidAttributes = _getAttributesStringToSliceArray(bid.attributes, ", ");
+            StringUtils.slice[] memory bidAttributes = _getAttributesStringToSliceArray(bid.attributes);
             uint8 attributeOffset = 1; // We skip base type
 
             for (uint8 i; i<bidAttributes.length; i++) {
@@ -407,7 +408,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
     {
         /* If there is an index list, only checks that punkIndex is in this list. */
         if (bid.indexes.length > 0) {
-            for (uint i=0; i < bid.indexes.length; i++) {
+            for (uint256 i; i<bid.indexes.length; i++) {
                 if (punkIndex == bid.indexes[i]) {
                     return true;
                 }
@@ -416,7 +417,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
         }
 
         if (bid.excludedIndexes.length > 0) {
-            for (uint i=0; i < bid.excludedIndexes.length; i++) {
+            for (uint256 i; i<bid.excludedIndexes.length; i++) {
                 if (punkIndex == bid.excludedIndexes[i]) {
                     revert PunkExcluded(punkIndex);
                 }
@@ -465,17 +466,16 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
     /**
      * @dev Split a string to an array of strings.slice
      * @param arrayString Array as a string
-     * @param separator The pattern describing where each split should occur
      */
-    function _getAttributesStringToSliceArray(string memory arrayString, string memory separator)
+    function _getAttributesStringToSliceArray(string memory arrayString)
         internal
         pure
         returns (StringUtils.slice[] memory)
     {
         StringUtils.slice memory s = arrayString.toSlice();
-        StringUtils.slice memory delim = separator.toSlice();
+        StringUtils.slice memory delim = ATTRIBUTES_SEPARATOR.toSlice();
         StringUtils.slice[] memory parts = new StringUtils.slice[](s.count(delim) + 1);
-        for (uint i = 0; i < parts.length; i++) {
+        for (uint256 i; i<parts.length; i++) {
            parts[i] = s.split(delim);
         }
         return parts;

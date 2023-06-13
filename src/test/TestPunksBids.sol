@@ -65,6 +65,14 @@ contract TestPunksBids is PunksBids {
         return _verify(signer, digest, v, r, s);
     }
 
+    function getAttributesStringToSliceArray(string memory arrayString)
+        public
+        pure
+        returns (StringUtils.slice[] memory)
+    {
+        return _getAttributesStringToSliceArray(arrayString);
+    }
+
     function hashDomain(EIP712Domain memory eip712Domain)
         public
         pure
