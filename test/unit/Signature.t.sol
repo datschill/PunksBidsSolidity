@@ -4,7 +4,6 @@ pragma solidity 0.8.19;
 import "../Base.t.sol";
 
 contract Signature is Base {
-
     uint256 public nonce;
     Bid public bid;
 
@@ -21,12 +20,7 @@ contract Signature is Base {
         bytes32 bidHashToSign = punksBids.hashToSign(bidHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(cocoPK, bidHashToSign);
 
-        Input memory input = Input({
-            bid: bid,
-            v: v,
-            r: r,
-            s: s
-        });
+        Input memory input = Input({bid: bid, v: v, r: r, s: s});
 
         bool isValidSignature = punksBids.validateSignature(input, bidHash);
 
@@ -39,12 +33,7 @@ contract Signature is Base {
         // Signer != Bidder
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(dadaPK, bidHashToSign);
 
-        Input memory input = Input({
-            bid: bid,
-            v: v,
-            r: r,
-            s: s
-        });
+        Input memory input = Input({bid: bid, v: v, r: r, s: s});
 
         // Msg.sender == Bidder
         vm.prank(coco);
@@ -59,12 +48,7 @@ contract Signature is Base {
         // Signer != Bidder
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(dadaPK, bidHashToSign);
 
-        Input memory input = Input({
-            bid: bid,
-            v: v,
-            r: r,
-            s: s
-        });
+        Input memory input = Input({bid: bid, v: v, r: r, s: s});
 
         bool isValidSignature = punksBids.validateSignature(input, bidHash);
 
@@ -77,16 +61,9 @@ contract Signature is Base {
         bytes32 bidHashToSign = punksBids.hashToSign(bidHash);
         (, bytes32 r, bytes32 s) = vm.sign(cocoPK, bidHashToSign);
 
-        Input memory input = Input({
-            bid: bid,
-            v: v,
-            r: r,
-            s: s
-        });
+        Input memory input = Input({bid: bid, v: v, r: r, s: s});
 
-        vm.expectRevert(
-            abi.encodeWithSelector(InvalidVParameter.selector, v)
-        );
+        vm.expectRevert(abi.encodeWithSelector(InvalidVParameter.selector, v));
         punksBids.validateSignature(input, bidHash);
     }
 
@@ -100,5 +77,3 @@ contract Signature is Base {
         assertEq(punksBids.verify(signer, bidHashToSign, v, r, s), true, "Signer should be properly recovered");
     }
 }
-
-

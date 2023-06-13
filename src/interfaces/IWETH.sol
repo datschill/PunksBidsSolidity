@@ -7,9 +7,7 @@ interface IWETH is IERC20 {
     /**
      * @dev Send ETH to get the same amount of WETH
      */
-    function deposit()
-        external
-        payable;
+    function deposit() external payable;
 
     /**
      * @dev Unwrap WETH to withdraw the same amount of ETH

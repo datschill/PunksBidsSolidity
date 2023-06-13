@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import { Bid, Input } from "./BidStructs.sol";
+import {Bid, Input} from "./BidStructs.sol";
 
 error PunksBidsClosed();
 error InvalidBidParameters(Bid bid);

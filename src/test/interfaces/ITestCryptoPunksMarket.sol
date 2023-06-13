@@ -8,14 +8,14 @@ interface ITestCryptoPunksMarket is ICryptoPunksMarket {
      * @dev Remove a Punk from sale
      * @param punkIndex Punk Index
      */
-    function punkNoLongerForSale(uint punkIndex) external;
+    function punkNoLongerForSale(uint256 punkIndex) external;
 
     /**
      * @dev Offer a Punk for sale
      * @param punkIndex Punk Index
      * @param minSalePriceInWei Minimum price in wei
      */
-    function offerPunkForSale(uint punkIndex, uint minSalePriceInWei) external;
+    function offerPunkForSale(uint256 punkIndex, uint256 minSalePriceInWei) external;
 
     /**
      * @dev Offer a Punk for sale, to a specific address
@@ -23,5 +23,5 @@ interface ITestCryptoPunksMarket is ICryptoPunksMarket {
      * @param minSalePriceInWei Minimum price in wei
      * @param toAddress The only address allowed to buy the Punk
      */
-    function offerPunkForSaleToAddress(uint punkIndex, uint minSalePriceInWei, address toAddress) external;
+    function offerPunkForSaleToAddress(uint256 punkIndex, uint256 minSalePriceInWei, address toAddress) external;
 }

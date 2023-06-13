@@ -4,13 +4,7 @@ pragma solidity 0.8.19;
 import "../Base.t.sol";
 
 contract BuyPunk is Base {
-    event BidMatched(
-        address indexed maker,
-        address indexed taker,
-        Bid bid,
-        uint256 price,
-        bytes32 bidHash
-    );
+    event BidMatched(address indexed maker, address indexed taker, Bid bid, uint256 price, bytes32 bidHash);
 
     uint256 public nonce;
     Bid public bid;
@@ -36,12 +30,7 @@ contract BuyPunk is Base {
         bidHashToSign = punksBids.hashToSign(bidHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(cocoPK, bidHashToSign);
 
-        input = Input({
-            bid: bid,
-            v: v,
-            r: r,
-            s: s
-        });
+        input = Input({bid: bid, v: v, r: r, s: s});
 
         seller = _offerPunkForSale(punkIndex, defaultPunkPrice, false);
     }
@@ -75,9 +64,7 @@ contract BuyPunk is Base {
         punksBids.executeMatch(input, punkIndex);
 
         vm.startPrank(input.bid.bidder);
-        vm.expectRevert(
-            abi.encodeWithSelector(BidAlreadyCancelledOrFilled.selector, input.bid)
-        );
+        vm.expectRevert(abi.encodeWithSelector(BidAlreadyCancelledOrFilled.selector, input.bid));
         punksBids.cancelBid(input.bid);
     }
 
@@ -110,9 +97,7 @@ contract BuyPunk is Base {
         // Invalid bid parameter
         input.bid.bidder = address(0);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(InvalidBidParameters.selector, input.bid)
-        );
+        vm.expectRevert(abi.encodeWithSelector(InvalidBidParameters.selector, input.bid));
         punksBids.executeMatch(input, punkIndex);
     }
 
@@ -122,16 +107,9 @@ contract BuyPunk is Base {
         // Signer != Bidder
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(dadaPK, bidHashToSign);
 
-        input = Input({
-            bid: bid,
-            v: v,
-            r: r,
-            s: s
-        });
-        
-        vm.expectRevert(
-            abi.encodeWithSelector(InvalidSignature.selector, input)
-        );
+        input = Input({bid: bid, v: v, r: r, s: s});
+
+        vm.expectRevert(abi.encodeWithSelector(InvalidSignature.selector, input));
         punksBids.executeMatch(input, punkIndex);
     }
 
@@ -141,5 +119,4 @@ contract BuyPunk is Base {
         emit BidMatched(bid.bidder, seller, bid, finalPrice, bidHash);
         punksBids.executeMatch(input, punkIndex);
     }
-    
 }

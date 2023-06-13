@@ -4,7 +4,6 @@ pragma solidity 0.8.19;
 import "../Base.t.sol";
 
 contract BuyPunk is Base {
-
     function setUp() public {
         deal(address(punksBids), defaultPunkPrice);
     }
@@ -28,7 +27,11 @@ contract BuyPunk is Base {
         address newPunkOwner = punksMarketPlace.punkIndexToAddress(punkIndex);
 
         assertEq(newPunkOwner, coco, "Bidder should be the new owner of the Punk");
-        assertEq(balanceAfterPB, balanceBeforePB - defaultPunkPrice, "PunksBids should have paid exactly defaultPunkPrice in ETH");
+        assertEq(
+            balanceAfterPB,
+            balanceBeforePB - defaultPunkPrice,
+            "PunksBids should have paid exactly defaultPunkPrice in ETH"
+        );
     }
 
     function testCannotBuyPunkIfPricePaidIsTooLow(uint256 punkIndex) public {
@@ -36,12 +39,7 @@ contract BuyPunk is Base {
 
         _offerPunkForSale(punkIndex, defaultPunkPrice);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(BuyPunkFailed.selector, punkIndex)
-        );
+        vm.expectRevert(abi.encodeWithSelector(BuyPunkFailed.selector, punkIndex));
         punksBids.executeBuyPunk(coco, punkIndex, defaultPunkPrice - 1);
     }
-
 }
-
-

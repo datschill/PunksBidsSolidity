@@ -11,7 +11,7 @@ import "src/test/interfaces/ITestCryptoPunksMarket.sol";
 
 import "src/interfaces/IWETH.sol";
 
-import { Bid } from "src/lib/BidStructs.sol";
+import {Bid} from "src/lib/BidStructs.sol";
 
 contract Base is EIP712, Test {
     using console for *;
@@ -21,13 +21,13 @@ contract Base is EIP712, Test {
     ITestCryptoPunksMarket public punksMarketPlace;
 
     address weth;
-    uint internal cocoPK;
+    uint256 internal cocoPK;
     address internal coco;
-    uint internal dadaPK;
+    uint256 internal dadaPK;
     address internal dada;
-    uint internal deployerPK;
+    uint256 internal deployerPK;
     address internal deployer;
-    
+
     uint256 public defaultPunkPrice = 0xffffffffffff;
 
     constructor() {
@@ -38,12 +38,9 @@ contract Base is EIP712, Test {
         string memory VERSION = punksBids.VERSION();
         weth = punksBids.WETH();
 
-        DOMAIN_SEPARATOR = _hashDomain(EIP712Domain({
-            name              : NAME,
-            version           : VERSION,
-            chainId           : block.chainid,
-            verifyingContract : address(punksBids)
-        }));
+        DOMAIN_SEPARATOR = _hashDomain(
+            EIP712Domain({name: NAME, version: VERSION, chainId: block.chainid, verifyingContract: address(punksBids)})
+        );
 
         cocoPK = vm.envUint("PRIVATE_KEY_COCO");
         coco = vm.addr(cocoPK);
@@ -53,7 +50,11 @@ contract Base is EIP712, Test {
         deployer = vm.addr(deployerPK);
     }
 
-    function signBid(uint privateKey, Bid memory bid, uint256 nonce) internal view returns (uint8 v, bytes32 r, bytes32 s) {
+    function signBid(uint256 privateKey, Bid memory bid, uint256 nonce)
+        internal
+        view
+        returns (uint8 v, bytes32 r, bytes32 s)
+    {
         bytes32 bidHash = punksBids.hashBid(bid, nonce);
         bytes32 bidHashToSign = punksBids.hashToSign(bidHash);
         return vm.sign(privateKey, bidHashToSign);

@@ -57,13 +57,7 @@ contract CanMatchBidAndPunk is Base {
     }
 
     function _canBuyPunk(Bid memory _bid, uint256 _punkIndex) internal {
-        ( 
-            ,
-            ,
-            address pSeller,
-            uint256 pPrice,
-            address onlySellTo
-        ) = punksMarketPlace.punksOfferedForSale(_punkIndex);
+        (,, address pSeller, uint256 pPrice, address onlySellTo) = punksMarketPlace.punksOfferedForSale(_punkIndex);
 
         bool isLocal = onlySellTo == address(punksBids);
 
@@ -75,15 +69,9 @@ contract CanMatchBidAndPunk is Base {
         assertEq(pPrice, punkPrice, "punkPrice should be equal to retrieved Punk price");
         assertEq(pSeller, seller, "seller should be equal to retrieved seller");
     }
-    
+
     function _canMatchBidAndPunk(Bid memory _bid, uint256 _punkIndex) internal {
-        ( 
-            ,
-            ,
-            address pSeller,
-            uint256 pPrice,
-            address onlySellTo
-        ) = punksMarketPlace.punksOfferedForSale(_punkIndex);
+        (,, address pSeller, uint256 pPrice, address onlySellTo) = punksMarketPlace.punksOfferedForSale(_punkIndex);
 
         bool isLocal = onlySellTo == address(punksBids);
 
@@ -103,9 +91,7 @@ contract CanMatchBidAndPunk is Base {
     }
 
     function testCannotBuyPunkNotForSale() public {
-        vm.expectRevert(
-            abi.encodeWithSelector(PunkNotForSale.selector, notForSalePunkIndex)
-        );
+        vm.expectRevert(abi.encodeWithSelector(PunkNotForSale.selector, notForSalePunkIndex));
         punksBids.canBuyPunk(bid, notForSalePunkIndex);
     }
 
@@ -114,9 +100,7 @@ contract CanMatchBidAndPunk is Base {
         vm.prank(forSalePunkAddress);
         punksMarketPlace.offerPunkForSaleToAddress(forSalePunkIndex, defaultPunkPrice, dada);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(PunkNotGloballyForSale.selector, forSalePunkIndex, dada)
-        );
+        vm.expectRevert(abi.encodeWithSelector(PunkNotGloballyForSale.selector, forSalePunkIndex, dada));
         punksBids.canBuyPunk(bid, forSalePunkIndex);
     }
 
@@ -127,9 +111,7 @@ contract CanMatchBidAndPunk is Base {
         // Bid Amount < finalPrice (don't take account of fees)
         bid.amount = finalPrice - 1;
 
-        vm.expectRevert(
-            abi.encodeWithSelector(BidAmountTooLow.selector, finalPrice, bid.amount)
-        );
+        vm.expectRevert(abi.encodeWithSelector(BidAmountTooLow.selector, finalPrice, bid.amount));
         punksBids.canBuyPunk(bid, forSalePunkIndex);
     }
 
@@ -151,18 +133,14 @@ contract CanMatchBidAndPunk is Base {
         bid.indexes.push(selectedPunkIndex);
         vm.assume(punkIndex != selectedPunkIndex);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(PunkNotSelected.selector, punkIndex)
-        );
+        vm.expectRevert(abi.encodeWithSelector(PunkNotSelected.selector, punkIndex));
         punksBids.validatePunkIndex(bid, punkIndex);
     }
 
     function testCannotBuyPunkIfIndexIsExcluded(uint16 punkIndex) public {
         bid.excludedIndexes.push(punkIndex);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(PunkExcluded.selector, punkIndex)
-        );
+        vm.expectRevert(abi.encodeWithSelector(PunkExcluded.selector, punkIndex));
         punksBids.validatePunkIndex(bid, punkIndex);
     }
 
@@ -197,16 +175,14 @@ contract CanMatchBidAndPunk is Base {
 
         _offerPunkForSale(punkIndex);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(InvalidPunkIndex.selector, punkIndex)
-        );
+        vm.expectRevert(abi.encodeWithSelector(InvalidPunkIndex.selector, punkIndex));
         punksBids.canMatchBidAndPunk(bid, punkIndex);
     }
 
     function testCannotMatchBidAndPunkIfBaseTypeDoesntMatch(uint8 baseTypeIndex) public {
         // Not Alien index
         string memory baseType = baseTypes[bound(baseTypeIndex, 0, baseTypes.length - 2)];
-        
+
         bid.baseType = baseType;
 
         vm.expectRevert(InvalidPunkBaseType.selector);
@@ -221,13 +197,11 @@ contract CanMatchBidAndPunk is Base {
 
     function testCannotMatchBidAndPunkIfAttributesCountDoesntMatch(uint8 attributesCount) public {
         vm.assume(attributesCount != 3);
-        
+
         bid.attributesCountEnabled = true;
         bid.attributesCount = attributesCount;
 
-        vm.expectRevert(
-            abi.encodeWithSelector(InvalidPunkAttributesCount.selector, 3, attributesCount)
-        );
+        vm.expectRevert(abi.encodeWithSelector(InvalidPunkAttributesCount.selector, 3, attributesCount));
         punksBids.canMatchBidAndPunk(bid, threeAttributesPunkIndex);
     }
 

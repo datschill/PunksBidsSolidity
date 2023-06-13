@@ -38,8 +38,8 @@ pragma solidity ^0.8.0;
 
 library StringUtils {
     struct slice {
-        uint _len;
-        uint _ptr;
+        uint256 _len;
+        uint256 _ptr;
     }
 
     /*
@@ -48,7 +48,7 @@ library StringUtils {
      * @return A newly allocated slice containing the entire string.
      */
     function toSlice(string memory self) internal pure returns (slice memory) {
-        uint ptr;
+        uint256 ptr;
         assembly {
             ptr := add(self, 0x20)
         }
@@ -64,36 +64,38 @@ library StringUtils {
      * @param other The second slice to compare.
      * @return The result of the comparison.
      */
-    function compare(slice memory self, slice memory other) internal pure returns (int) {
-        uint shortest = self._len;
-        if (other._len < self._len)
+    function compare(slice memory self, slice memory other) internal pure returns (int256) {
+        uint256 shortest = self._len;
+        if (other._len < self._len) {
             shortest = other._len;
+        }
 
-        uint selfptr = self._ptr;
-        uint otherptr = other._ptr;
-        for (uint idx = 0; idx < shortest; idx += 32) {
-            uint a;
-            uint b;
+        uint256 selfptr = self._ptr;
+        uint256 otherptr = other._ptr;
+        for (uint256 idx = 0; idx < shortest; idx += 32) {
+            uint256 a;
+            uint256 b;
             assembly {
                 a := mload(selfptr)
                 b := mload(otherptr)
             }
             if (a != b) {
                 // Mask out irrelevant bytes and check again
-                uint mask = type(uint).max; // 0xffff...
-                if(shortest < 32) {
-                  mask = ~(2 ** (8 * (32 - shortest + idx)) - 1);
+                uint256 mask = type(uint256).max; // 0xffff...
+                if (shortest < 32) {
+                    mask = ~(2 ** (8 * (32 - shortest + idx)) - 1);
                 }
                 unchecked {
-                    uint diff = (a & mask) - (b & mask);
-                    if (diff != 0)
-                        return int(diff);
+                    uint256 diff = (a & mask) - (b & mask);
+                    if (diff != 0) {
+                        return int256(diff);
+                    }
                 }
             }
             selfptr += 32;
             otherptr += 32;
         }
-        return int(self._len) - int(other._len);
+        return int256(self._len) - int256(other._len);
     }
 
     /*
@@ -108,9 +110,13 @@ library StringUtils {
 
     // Returns the memory address of the first byte of the first occurrence of
     // `needle` in `self`, or the first byte after `self` if not found.
-    function findPtr(uint selflen, uint selfptr, uint needlelen, uint needleptr) private pure returns (uint) {
-        uint ptr = selfptr;
-        uint idx;
+    function findPtr(uint256 selflen, uint256 selfptr, uint256 needlelen, uint256 needleptr)
+        private
+        pure
+        returns (uint256)
+    {
+        uint256 ptr = selfptr;
+        uint256 idx;
 
         if (needlelen <= selflen) {
             if (needlelen <= 32) {
@@ -120,29 +126,41 @@ library StringUtils {
                 }
 
                 bytes32 needledata;
-                assembly { needledata := and(mload(needleptr), mask) }
+                assembly {
+                    needledata := and(mload(needleptr), mask)
+                }
 
-                uint end = selfptr + selflen - needlelen;
+                uint256 end = selfptr + selflen - needlelen;
                 bytes32 ptrdata;
-                assembly { ptrdata := and(mload(ptr), mask) }
+                assembly {
+                    ptrdata := and(mload(ptr), mask)
+                }
 
                 while (ptrdata != needledata) {
-                    if (ptr >= end)
+                    if (ptr >= end) {
                         return selfptr + selflen;
+                    }
                     ptr++;
-                    assembly { ptrdata := and(mload(ptr), mask) }
+                    assembly {
+                        ptrdata := and(mload(ptr), mask)
+                    }
                 }
                 return ptr;
             } else {
                 // For long needles, use hashing
                 bytes32 hash;
-                assembly { hash := keccak256(needleptr, needlelen) }
+                assembly {
+                    hash := keccak256(needleptr, needlelen)
+                }
 
                 for (idx = 0; idx <= selflen - needlelen; idx++) {
                     bytes32 testHash;
-                    assembly { testHash := keccak256(ptr, needlelen) }
-                    if (hash == testHash)
+                    assembly {
+                        testHash := keccak256(ptr, needlelen)
+                    }
+                    if (hash == testHash) {
                         return ptr;
+                    }
                     ptr += 1;
                 }
             }
@@ -152,8 +170,12 @@ library StringUtils {
 
     // Returns the memory address of the first byte after the last occurrence of
     // `needle` in `self`, or the address of `self` if not found.
-    function rfindPtr(uint selflen, uint selfptr, uint needlelen, uint needleptr) private pure returns (uint) {
-        uint ptr;
+    function rfindPtr(uint256 selflen, uint256 selfptr, uint256 needlelen, uint256 needleptr)
+        private
+        pure
+        returns (uint256)
+    {
+        uint256 ptr;
 
         if (needlelen <= selflen) {
             if (needlelen <= 32) {
@@ -163,29 +185,41 @@ library StringUtils {
                 }
 
                 bytes32 needledata;
-                assembly { needledata := and(mload(needleptr), mask) }
+                assembly {
+                    needledata := and(mload(needleptr), mask)
+                }
 
                 ptr = selfptr + selflen - needlelen;
                 bytes32 ptrdata;
-                assembly { ptrdata := and(mload(ptr), mask) }
+                assembly {
+                    ptrdata := and(mload(ptr), mask)
+                }
 
                 while (ptrdata != needledata) {
-                    if (ptr <= selfptr)
+                    if (ptr <= selfptr) {
                         return selfptr;
+                    }
                     ptr--;
-                    assembly { ptrdata := and(mload(ptr), mask) }
+                    assembly {
+                        ptrdata := and(mload(ptr), mask)
+                    }
                 }
                 return ptr + needlelen;
             } else {
                 // For long needles, use hashing
                 bytes32 hash;
-                assembly { hash := keccak256(needleptr, needlelen) }
+                assembly {
+                    hash := keccak256(needleptr, needlelen)
+                }
                 ptr = selfptr + (selflen - needlelen);
                 while (ptr >= selfptr) {
                     bytes32 testHash;
-                    assembly { testHash := keccak256(ptr, needlelen) }
-                    if (hash == testHash)
+                    assembly {
+                        testHash := keccak256(ptr, needlelen)
+                    }
+                    if (hash == testHash) {
                         return ptr + needlelen;
+                    }
                     ptr -= 1;
                 }
             }
@@ -204,7 +238,7 @@ library StringUtils {
      * @return `token`.
      */
     function split(slice memory self, slice memory needle, slice memory token) internal pure returns (slice memory) {
-        uint ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr);
+        uint256 ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr);
         token._ptr = self._ptr;
         token._len = ptr - self._ptr;
         if (ptr == self._ptr + self._len) {
@@ -236,8 +270,8 @@ library StringUtils {
      * @param needle The text to search for in `self`.
      * @return The number of occurrences of `needle` found in `self`.
      */
-    function count(slice memory self, slice memory needle) internal pure returns (uint cnt) {
-        uint ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr) + needle._len;
+    function count(slice memory self, slice memory needle) internal pure returns (uint256 cnt) {
+        uint256 ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr) + needle._len;
         while (ptr <= self._ptr + self._len) {
             cnt++;
             ptr = findPtr(self._len - (ptr - self._ptr), ptr, needle._len, needle._ptr) + needle._len;

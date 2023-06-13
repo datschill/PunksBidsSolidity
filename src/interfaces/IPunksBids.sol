@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import { Input, Bid } from "../lib/BidStructs.sol";
+import {Input, Bid} from "../lib/BidStructs.sol";
 
 interface IPunksBids {
     /**
@@ -37,6 +37,5 @@ interface IPunksBids {
      * @param buy Input of a Bid and its matching signature
      * @param punkIndex Punk Index
      */
-    function executeMatch(Input calldata buy, uint256 punkIndex)
-        external;
+    function executeMatch(Input calldata buy, uint256 punkIndex) external;
 }

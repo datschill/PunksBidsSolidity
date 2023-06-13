@@ -28,7 +28,7 @@ contract Cancel is Base {
 
         bids.push(bidCoco);
         bids.push(nextBidCoco);
-        
+
         hashes.push(hashBidCoco);
         hashes.push(hashNextBidCoco);
     }
@@ -50,9 +50,7 @@ contract Cancel is Base {
     }
 
     function testCannotCancelBid() public {
-        vm.expectRevert(
-            abi.encodeWithSelector(SenderNotBidder.selector, address(this), bidCoco.bidder)
-        );
+        vm.expectRevert(abi.encodeWithSelector(SenderNotBidder.selector, address(this), bidCoco.bidder));
         punksBids.cancelBid(bidCoco);
     }
 
@@ -60,9 +58,7 @@ contract Cancel is Base {
         vm.startPrank(coco);
         punksBids.cancelBid(bidCoco);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(BidAlreadyCancelledOrFilled.selector, bidCoco)
-        );
+        vm.expectRevert(abi.encodeWithSelector(BidAlreadyCancelledOrFilled.selector, bidCoco));
         punksBids.cancelBid(bidCoco);
         vm.stopPrank();
     }
@@ -74,7 +70,7 @@ contract Cancel is Base {
         punksBids.cancelBid(bidCoco);
         vm.stopPrank();
     }
-    
+
     // cancelBids
     function testBidsCancelled() public {
         vm.prank(coco);
@@ -87,9 +83,7 @@ contract Cancel is Base {
     }
 
     function testCannotCancelBids() public {
-        vm.expectRevert(
-            abi.encodeWithSelector(SenderNotBidder.selector, address(this), bids[0].bidder)
-        );
+        vm.expectRevert(abi.encodeWithSelector(SenderNotBidder.selector, address(this), bids[0].bidder));
         punksBids.cancelBids(bids);
     }
 
@@ -106,5 +100,3 @@ contract Cancel is Base {
         vm.stopPrank();
     }
 }
-
-

@@ -23,9 +23,11 @@ contract String is Base {
     }
 
     function testEquals(string memory first, string memory second) public {
-        assertEq(first.toSlice().equals(second.toSlice()),
-                    keccak256(abi.encodePacked(first)) == keccak256(abi.encodePacked(second)),
-                    "String comparaison should be the same as keccak256 comparaison");
+        assertEq(
+            first.toSlice().equals(second.toSlice()),
+            keccak256(abi.encodePacked(first)) == keccak256(abi.encodePacked(second)),
+            "String comparaison should be the same as keccak256 comparaison"
+        );
     }
 
     function testSplit() public {
@@ -41,13 +43,13 @@ contract String is Base {
 
         StringUtils.slice memory delim = punksBids.ATTRIBUTES_SEPARATOR().toSlice();
 
-        for (uint256 i; i<attributes.length; i++) {
+        for (uint256 i; i < attributes.length; i++) {
             assertEq(attributes[i].equals(arrayString.split(delim)), true, "Check that we retrieved attribute");
         }
     }
 
     function testToSlice(string memory str) public {
-        uint ptr;
+        uint256 ptr;
         assembly {
             ptr := add(str, 0x20)
         }
@@ -62,11 +64,16 @@ contract String is Base {
     function testCount(string memory str, uint8 occurence) public {
         string memory noise = "delimiter";
 
-        vm.assume(bytes(str).length != 0 && 
-                    (bytes(str).length != bytes(noise).length || keccak256(abi.encodePacked(str)) != keccak256(abi.encodePacked(noise))));
+        vm.assume(
+            bytes(str).length != 0
+                && (
+                    bytes(str).length != bytes(noise).length
+                        || keccak256(abi.encodePacked(str)) != keccak256(abi.encodePacked(noise))
+                )
+        );
 
         string memory sentence = "";
-        for (uint8 i; i<occurence; i++) {
+        for (uint8 i; i < occurence; i++) {
             sentence = string.concat(sentence, noise, str);
         }
 
@@ -77,5 +84,3 @@ contract String is Base {
         assertEq(count, occurence, "StringUtils.count()");
     }
 }
-
-

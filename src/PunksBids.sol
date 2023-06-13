@@ -13,14 +13,14 @@ import "./interfaces/IPunksBids.sol";
 import "./interfaces/ICryptoPunksMarket.sol";
 import "./interfaces/ICryptoPunksData.sol";
 
-import { Input, Bid } from "./lib/BidStructs.sol";
+import {Input, Bid} from "./lib/BidStructs.sol";
 
 /**
-* @title PunksBids
-* @author 0xd0s.eth
-* @notice Allows bidding with WETH on specific CryptoPunks or attributes
-* @dev Lot of lines of code were taken from the Blur Marketplace, as a source of trust and good architecture example
-*/
+ * @title PunksBids
+ * @author 0xd0s.eth
+ * @notice Allows bidding with WETH on specific CryptoPunks or attributes
+ * @dev Lot of lines of code were taken from the Blur Marketplace, as a source of trust and good architecture example
+ */
 contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
     using SafeERC20 for IWETH;
     using StringUtils for *;
@@ -40,6 +40,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
         isOpen = 1;
         emit Opened();
     }
+
     function close() external onlyOwner {
         isOpen = 0;
         emit Closed();
@@ -66,13 +67,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
     uint16 public localFeeRate = 5;
 
     /* Events */
-    event BidMatched(
-        address indexed maker,
-        address indexed taker,
-        Bid bid,
-        uint256 price,
-        bytes32 bidHash
-    );
+    event BidMatched(address indexed maker, address indexed taker, Bid bid, uint256 price, bytes32 bidHash);
 
     event BidCancelled(bytes32 hash);
     event NonceIncremented(address indexed bidder, uint256 newNonce);
@@ -83,12 +78,9 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
     constructor() {
         isOpen = 1;
 
-        DOMAIN_SEPARATOR = _hashDomain(EIP712Domain({
-            name              : NAME,
-            version           : VERSION,
-            chainId           : block.chainid,
-            verifyingContract : address(this)
-        }));
+        DOMAIN_SEPARATOR = _hashDomain(
+            EIP712Domain({name: NAME, version: VERSION, chainId: block.chainid, verifyingContract: address(this)})
+        );
     }
 
     receive() external payable {}
@@ -99,18 +91,16 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      * @param buy Buy input
      * @param punkIndex Index of the Punk to be buy on the CryptoPunks Marketplace
      */
-    function executeMatch(Input calldata buy, uint256 punkIndex)
-        external
-        whenOpen
-        nonReentrant
-    {
+    function executeMatch(Input calldata buy, uint256 punkIndex) external whenOpen nonReentrant {
         bytes32 bidHash = _hashBid(buy.bid, nonces[buy.bid.bidder]);
 
-        if (!_validateBidParameters(buy.bid, bidHash))
+        if (!_validateBidParameters(buy.bid, bidHash)) {
             revert InvalidBidParameters(buy.bid);
+        }
 
-        if (!_validateSignature(buy, bidHash))
+        if (!_validateSignature(buy, bidHash)) {
             revert InvalidSignature(buy);
+        }
 
         (uint256 price, uint256 punkPrice, address seller) = _canMatchBidAndPunk(buy.bid, punkIndex);
 
@@ -121,13 +111,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
 
         _executeBuyPunk(buy.bid.bidder, punkIndex, punkPrice);
 
-        emit BidMatched(
-            buy.bid.bidder,
-            seller,
-            buy.bid,
-            price,
-            bidHash
-        );
+        emit BidMatched(buy.bid.bidder, seller, buy.bid, price, bidHash);
     }
 
     /**
@@ -136,13 +120,15 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      */
     function cancelBid(Bid calldata bid) public {
         /* Assert sender is authorized to cancel order. */
-        if (msg.sender != bid.bidder)
+        if (msg.sender != bid.bidder) {
             revert SenderNotBidder(msg.sender, bid.bidder);
+        }
 
         bytes32 hash = _hashBid(bid, nonces[bid.bidder]);
 
-        if (cancelledOrFilled[hash])
+        if (cancelledOrFilled[hash]) {
             revert BidAlreadyCancelledOrFilled(bid);
+        }
 
         /* Mark bid as cancelled, preventing it from being matched. */
         cancelledOrFilled[hash] = true;
@@ -192,12 +178,14 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      * @param recipient The recipient of the fees
      */
     function withdrawFees(address recipient) external onlyOwner {
-        if (recipient == address(0))
+        if (recipient == address(0)) {
             revert TransferToZeroAddress();
+        }
         uint256 amount = address(this).balance;
         (bool success,) = payable(recipient).call{value: amount}("");
-        if (!success)
+        if (!success) {
             revert ETHTransferFailed(recipient);
+        }
 
         emit FeesWithdrawn(recipient, amount);
     }
@@ -209,19 +197,15 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      * @param bid Bid
      * @param bidHash Hash of bid
      */
-    function _validateBidParameters(Bid calldata bid, bytes32 bidHash)
-        internal
-        view
-        returns (bool)
-    {
-        return (
-            /* Bid must have a bidder. */
-            (bid.bidder != address(0)) &&
+    function _validateBidParameters(Bid calldata bid, bytes32 bidHash) internal view returns (bool) {
+        return
+        /* Bid must have a bidder. */
+        (
+            (bid.bidder != address(0))
             /* Bid must not be cancelled or filled. */
-            (!cancelledOrFilled[bidHash]) &&
+            && (!cancelledOrFilled[bidHash])
             /* Bid must be settleable. */
-            (bid.listingTime < block.timestamp) &&
-            (block.timestamp < bid.expirationTime)
+            && (bid.listingTime < block.timestamp) && (block.timestamp < bid.expirationTime)
         );
     }
 
@@ -230,26 +214,13 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      * @param bid Bid
      * @param bidHash Hash of bid
      */
-    function _validateSignature(Input calldata bid, bytes32 bidHash)
-        internal
-        view
-        returns (bool)
-    {
-
+    function _validateSignature(Input calldata bid, bytes32 bidHash) internal view returns (bool) {
         if (bid.bid.bidder == msg.sender) {
-          return true;
+            return true;
         }
 
         /* Check user authorization. */
-        if (
-            !_validateUserAuthorization(
-                bidHash,
-                bid.bid.bidder,
-                bid.v,
-                bid.r,
-                bid.s
-            )
-        ) {
+        if (!_validateUserAuthorization(bidHash, bid.bid.bidder, bid.v, bid.r, bid.s)) {
             return false;
         }
 
@@ -264,13 +235,11 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      * @param r r
      * @param s s
      */
-    function _validateUserAuthorization(
-        bytes32 bidHash,
-        address bidder,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) internal view returns (bool) {
+    function _validateUserAuthorization(bytes32 bidHash, address bidder, uint8 v, bytes32 r, bytes32 s)
+        internal
+        view
+        returns (bool)
+    {
         bytes32 hashToSign = _hashToSign(bidHash);
         // PASHOV QUESTION : Should I use OZ ECDSA instead ? (return ECDSA.recover(bidHash, signature) == signer;)
         return _verify(bidder, hashToSign, v, r, s);
@@ -284,20 +253,15 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      * @param r r
      * @param s s
      */
-    function _verify(
-        address signer,
-        bytes32 digest,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) internal pure returns (bool) {
-        if (v != 27 && v != 28)
+    function _verify(address signer, bytes32 digest, uint8 v, bytes32 r, bytes32 s) internal pure returns (bool) {
+        if (v != 27 && v != 28) {
             revert InvalidVParameter(v);
+        }
         address recoveredSigner = ecrecover(digest, v, r, s);
         if (recoveredSigner == address(0)) {
-          return false;
+            return false;
         } else {
-          return signer == recoveredSigner;
+            return signer == recoveredSigner;
         }
     }
 
@@ -313,8 +277,9 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
     {
         (price, punkPrice, seller) = _canBuyPunk(bid, punkIndex);
 
-        if (!_validatePunkIndex(bid, uint16(punkIndex)))
+        if (!_validatePunkIndex(bid, uint16(punkIndex))) {
             revert InvalidPunkIndex(punkIndex);
+        }
 
         /* Retrieve Punk attributes */
         string memory punkAttributesString = ICryptoPunksData(CRYPTOPUNKS_DATA).punkAttributes(uint16(punkIndex));
@@ -323,41 +288,44 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
         /* Checks Punk base type. */
         if (bytes(bid.baseType).length > 0) {
             StringUtils.slice memory punkBaseType = punkAttributes[0];
-            if (!punkBaseType.contains(bid.baseType.toSlice()))
+            if (!punkBaseType.contains(bid.baseType.toSlice())) {
                 revert InvalidPunkBaseType();
+            }
         }
 
         /* Checks attributes count. */
         if (bid.attributesCountEnabled) {
             /* -1 to take account of base type. */
             uint8 punkAttributesCount = uint8(punkAttributes.length - 1);
-            if (punkAttributesCount != bid.attributesCount)
+            if (punkAttributesCount != bid.attributesCount) {
                 revert InvalidPunkAttributesCount(punkAttributesCount, bid.attributesCount);
+            }
         }
-        
+
         /* Compare Bid attributes with Punk attributes. */
         if (bytes(bid.attributes).length > 0) {
-            StringUtils.slice memory currentBidAttribute = ''.toSlice();
-            StringUtils.slice memory currentPunkAttribute = ''.toSlice();
+            StringUtils.slice memory currentBidAttribute = "".toSlice();
+            StringUtils.slice memory currentPunkAttribute = "".toSlice();
             StringUtils.slice[] memory bidAttributes = _getAttributesStringToSliceArray(bid.attributes);
             uint8 attributeOffset = 1; // We skip base type
 
-            for (uint8 i; i<bidAttributes.length; i++) {
+            for (uint8 i; i < bidAttributes.length; i++) {
                 bool hasAttribute = false;
                 currentBidAttribute = bidAttributes[i];
 
-                for (uint8 j=attributeOffset; j<punkAttributes.length; j++) {
+                for (uint8 j = attributeOffset; j < punkAttributes.length; j++) {
                     currentPunkAttribute = punkAttributes[j];
                     if (currentBidAttribute.equals(currentPunkAttribute)) {
                         hasAttribute = true;
-                        attributeOffset = j+1;
+                        attributeOffset = j + 1;
                         break;
                     }
                 }
 
                 // PASHOV QUESTION : Remove attributeOffset ? Currently more gas efficient -> but if removed, it can reverts (non matching) if bids aren't properly sorted offchain
-                if (!hasAttribute)
+                if (!hasAttribute) {
                     revert PunkMissingAttributes();
+                }
             }
         }
 
@@ -369,29 +337,23 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      * @param bid Bid
      * @param punkIndex Punk index
      */
-    function _canBuyPunk(Bid calldata bid, uint256 punkIndex)
-        internal
-        view
-        returns (uint256, uint256, address)
-    {
-        ( 
-            bool isForSale,
-            ,
-            address seller,
-            uint256 punkPrice,
-            address onlySellTo
-        ) = ICryptoPunksMarket(CRYPTOPUNKS_MARKETPLACE).punksOfferedForSale(punkIndex);
+    function _canBuyPunk(Bid calldata bid, uint256 punkIndex) internal view returns (uint256, uint256, address) {
+        (bool isForSale,, address seller, uint256 punkPrice, address onlySellTo) =
+            ICryptoPunksMarket(CRYPTOPUNKS_MARKETPLACE).punksOfferedForSale(punkIndex);
 
-        if (!isForSale)
+        if (!isForSale) {
             revert PunkNotForSale(punkIndex);
-        if (onlySellTo != address(0) && onlySellTo != address(this))
+        }
+        if (onlySellTo != address(0) && onlySellTo != address(this)) {
             revert PunkNotGloballyForSale(punkIndex, onlySellTo);
+        }
 
         uint16 currentFeeRate = onlySellTo == address(this) ? localFeeRate : feeRate;
         uint256 price = INVERSE_BASIS_POINT * punkPrice / (INVERSE_BASIS_POINT - currentFeeRate);
 
-        if (price > bid.amount)
+        if (price > bid.amount) {
             revert BidAmountTooLow(price, bid.amount);
+        }
 
         return (price, punkPrice, seller);
     }
@@ -401,14 +363,10 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      * @param bid Bid
      * @param punkIndex Punk index
      */
-    function _validatePunkIndex(Bid calldata bid, uint16 punkIndex)
-        internal
-        pure
-        returns (bool)
-    {
+    function _validatePunkIndex(Bid calldata bid, uint16 punkIndex) internal pure returns (bool) {
         /* If there is an index list, only checks that punkIndex is in this list. */
         if (bid.indexes.length > 0) {
-            for (uint256 i; i<bid.indexes.length; i++) {
+            for (uint256 i; i < bid.indexes.length; i++) {
                 if (punkIndex == bid.indexes[i]) {
                     return true;
                 }
@@ -417,17 +375,14 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
         }
 
         if (bid.excludedIndexes.length > 0) {
-            for (uint256 i; i<bid.excludedIndexes.length; i++) {
+            for (uint256 i; i < bid.excludedIndexes.length; i++) {
                 if (punkIndex == bid.excludedIndexes[i]) {
                     revert PunkExcluded(punkIndex);
                 }
             }
         }
 
-        return (
-            (bid.maxIndex == 0 || punkIndex <= bid.maxIndex) &&
-            (bid.modulo == 0 || punkIndex % bid.modulo == 0)
-        );
+        return ((bid.maxIndex == 0 || punkIndex <= bid.maxIndex) && (bid.modulo == 0 || punkIndex % bid.modulo == 0));
     }
 
     /**
@@ -435,9 +390,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      * @param bidder Bidder
      * @param price Price to be paid by the bidder
      */
-    function _executeWETHTransfer(address bidder, uint256 price)
-        internal
-    {
+    function _executeWETHTransfer(address bidder, uint256 price) internal {
         /* Retrieve WETH from bidder. */
         IWETH(WETH).safeTransferFrom(bidder, address(this), price);
 
@@ -451,14 +404,14 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
      * @param punkIndex Punk index
      * @param punkPrice Punk price
      */
-    function _executeBuyPunk(address bidder, uint256 punkIndex, uint256 punkPrice)
-        internal
-    {
-        try ICryptoPunksMarket(CRYPTOPUNKS_MARKETPLACE).buyPunk{value: punkPrice}(punkIndex) {} catch {
+    function _executeBuyPunk(address bidder, uint256 punkIndex, uint256 punkPrice) internal {
+        try ICryptoPunksMarket(CRYPTOPUNKS_MARKETPLACE).buyPunk{value: punkPrice}(punkIndex) {}
+        catch {
             revert BuyPunkFailed(punkIndex);
         }
 
-        try ICryptoPunksMarket(CRYPTOPUNKS_MARKETPLACE).transferPunk(bidder, punkIndex) {} catch {
+        try ICryptoPunksMarket(CRYPTOPUNKS_MARKETPLACE).transferPunk(bidder, punkIndex) {}
+        catch {
             revert TransferPunkFailed(punkIndex);
         }
     }
@@ -475,8 +428,8 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
         StringUtils.slice memory s = arrayString.toSlice();
         StringUtils.slice memory delim = ATTRIBUTES_SEPARATOR.toSlice();
         StringUtils.slice[] memory parts = new StringUtils.slice[](s.count(delim) + 1);
-        for (uint256 i; i<parts.length; i++) {
-           parts[i] = s.split(delim);
+        for (uint256 i; i < parts.length; i++) {
+            parts[i] = s.split(delim);
         }
         return parts;
     }

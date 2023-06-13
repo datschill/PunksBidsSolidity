@@ -4,7 +4,6 @@ pragma solidity 0.8.19;
 import "../Base.t.sol";
 
 contract BidParameters is Base {
-
     uint256 public nonce;
     Bid public bid;
 
@@ -69,5 +68,3 @@ contract BidParameters is Base {
         assertEq(areValidParameters, false, "Expiration time should be after block timestamp");
     }
 }
-
-

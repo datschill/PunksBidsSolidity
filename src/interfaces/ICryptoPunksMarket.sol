@@ -19,10 +19,7 @@ interface ICryptoPunksMarket {
      * @dev Retrieve owner address of a Punk
      * @param punkIndex Punk Index
      */
-    function punkIndexToAddress(uint256 punkIndex)
-        external
-        view
-        returns (address);
+    function punkIndexToAddress(uint256 punkIndex) external view returns (address);
 
     /**
      * @dev Retrieve Punk sale details
@@ -31,11 +28,5 @@ interface ICryptoPunksMarket {
     function punksOfferedForSale(uint256 _punkIndex)
         external
         view
-        returns (
-            bool isForSale,
-            uint256 punkIndex,
-            address seller,
-            uint256 minValue,
-            address onlySellTo
-        );
+        returns (bool isForSale, uint256 punkIndex, address seller, uint256 minValue, address onlySellTo);
 }

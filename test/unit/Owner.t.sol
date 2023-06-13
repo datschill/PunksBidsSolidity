@@ -52,7 +52,7 @@ contract Fees is Base {
         emit FeeRateUpdated(20);
         punksBids.setFeeRate(20);
     }
-    
+
     // setLocalFeeRate
     function testSetLocalFeeRate() public {
         punksBids.setLocalFeeRate(20);
@@ -79,9 +79,7 @@ contract Fees is Base {
     }
 
     function testCannotWithdrawToNonPayableAddress() public {
-        vm.expectRevert(
-            abi.encodeWithSelector(ETHTransferFailed.selector, address(revertFallback))
-        );
+        vm.expectRevert(abi.encodeWithSelector(ETHTransferFailed.selector, address(revertFallback)));
         punksBids.withdrawFees(address(revertFallback));
     }
 
@@ -117,5 +115,3 @@ contract Fees is Base {
         payable(revertFallback).call{value: amount}("PunksBids");
     }
 }
-
-
