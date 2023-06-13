@@ -38,7 +38,7 @@ contract Base is EIP712, Test {
         string memory VERSION = punksBids.VERSION();
         weth = punksBids.WETH();
 
-        DOMAIN_SEPARATOR = _hashDomain(
+        _domainSeparator = _hashDomain(
             EIP712Domain({name: NAME, version: VERSION, chainId: block.chainid, verifyingContract: address(punksBids)})
         );
 

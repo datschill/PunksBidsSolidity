@@ -16,14 +16,14 @@ contract EIP712 {
     }
 
     /* Order typehash for EIP 712 compatibility. */
-    bytes32 public constant BID_TYPEHASH = keccak256(
+    bytes32 internal constant BID_TYPEHASH = keccak256(
         "Bid(address bidder,bool attributesCountEnabled,uint8 attributesCount,uint16 modulo,uint16 maxIndex,uint16[] indexes,uint16[] excludedIndexes,string baseType,string attributes,uint256 amount,uint256 listingTime,uint256 expirationTime,uint256 salt,uint256 nonce)"
     );
 
-    bytes32 constant EIP712DOMAIN_TYPEHASH =
+    bytes32 internal constant EIP712DOMAIN_TYPEHASH =
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
-    bytes32 DOMAIN_SEPARATOR;
+    bytes32 internal _domainSeparator;
 
     function _hashDomain(EIP712Domain memory eip712Domain) internal pure returns (bytes32) {
         return keccak256(
@@ -72,6 +72,6 @@ contract EIP712 {
     }
 
     function _hashToSign(bytes32 bidHash) internal view returns (bytes32 hash) {
-        return keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, bidHash));
+        return keccak256(abi.encodePacked("\x19\x01", _domainSeparator, bidHash));
     }
 }

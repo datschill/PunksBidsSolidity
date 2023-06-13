@@ -78,7 +78,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
     constructor() {
         isOpen = 1;
 
-        DOMAIN_SEPARATOR = _hashDomain(
+        _domainSeparator = _hashDomain(
             EIP712Domain({name: NAME, version: VERSION, chainId: block.chainid, verifyingContract: address(this)})
         );
     }
