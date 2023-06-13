@@ -283,11 +283,11 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
 
         /* Retrieve Punk attributes */
         string memory punkAttributesString = ICryptoPunksData(CRYPTOPUNKS_DATA).punkAttributes(uint16(punkIndex));
-        StringUtils.slice[] memory punkAttributes = _getAttributesStringToSliceArray(punkAttributesString);
+        StringUtils.Slice[] memory punkAttributes = _getAttributesStringToSliceArray(punkAttributesString);
 
         /* Checks Punk base type. */
         if (bytes(bid.baseType).length > 0) {
-            StringUtils.slice memory punkBaseType = punkAttributes[0];
+            StringUtils.Slice memory punkBaseType = punkAttributes[0];
             if (!punkBaseType.contains(bid.baseType.toSlice())) {
                 revert InvalidPunkBaseType();
             }
@@ -304,9 +304,9 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
 
         /* Compare Bid attributes with Punk attributes. */
         if (bytes(bid.attributes).length > 0) {
-            StringUtils.slice memory currentBidAttribute = "".toSlice();
-            StringUtils.slice memory currentPunkAttribute = "".toSlice();
-            StringUtils.slice[] memory bidAttributes = _getAttributesStringToSliceArray(bid.attributes);
+            StringUtils.Slice memory currentBidAttribute = "".toSlice();
+            StringUtils.Slice memory currentPunkAttribute = "".toSlice();
+            StringUtils.Slice[] memory bidAttributes = _getAttributesStringToSliceArray(bid.attributes);
             uint8 attributeOffset = 1; // We skip base type
 
             for (uint8 i; i < bidAttributes.length; i++) {
@@ -423,11 +423,11 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable {
     function _getAttributesStringToSliceArray(string memory arrayString)
         internal
         pure
-        returns (StringUtils.slice[] memory)
+        returns (StringUtils.Slice[] memory)
     {
-        StringUtils.slice memory s = arrayString.toSlice();
-        StringUtils.slice memory delim = ATTRIBUTES_SEPARATOR.toSlice();
-        StringUtils.slice[] memory parts = new StringUtils.slice[](s.count(delim) + 1);
+        StringUtils.Slice memory s = arrayString.toSlice();
+        StringUtils.Slice memory delim = ATTRIBUTES_SEPARATOR.toSlice();
+        StringUtils.Slice[] memory parts = new StringUtils.Slice[](s.count(delim) + 1);
         for (uint256 i; i < parts.length; i++) {
             parts[i] = s.split(delim);
         }

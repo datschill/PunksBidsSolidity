@@ -43,7 +43,7 @@ contract TestPunksBids is PunksBids {
     function getAttributesStringToSliceArray(string memory arrayString)
         public
         pure
-        returns (StringUtils.slice[] memory)
+        returns (StringUtils.Slice[] memory)
     {
         return _getAttributesStringToSliceArray(arrayString);
     }

@@ -9,12 +9,12 @@ contract String is Base {
     function testAttributesStringToArray() public {
         string memory arrayString = "Alien, Earring, Forward Cap, Cigarette";
 
-        StringUtils.slice[] memory parts = punksBids.getAttributesStringToSliceArray(arrayString);
+        StringUtils.Slice[] memory parts = punksBids.getAttributesStringToSliceArray(arrayString);
 
-        StringUtils.slice memory alienSlice = "Alien".toSlice();
-        StringUtils.slice memory earringSlice = "Earring".toSlice();
-        StringUtils.slice memory capSlice = "Forward Cap".toSlice();
-        StringUtils.slice memory cigaretteSlice = "Cigarette".toSlice();
+        StringUtils.Slice memory alienSlice = "Alien".toSlice();
+        StringUtils.Slice memory earringSlice = "Earring".toSlice();
+        StringUtils.Slice memory capSlice = "Forward Cap".toSlice();
+        StringUtils.Slice memory cigaretteSlice = "Cigarette".toSlice();
 
         assertEq(parts[0].equals(alienSlice), true, "Check Alien base type");
         assertEq(parts[1].equals(earringSlice), true, "Check Earring attribute");
@@ -31,17 +31,17 @@ contract String is Base {
     }
 
     function testSplit() public {
-        StringUtils.slice memory arrayString = "Zombie, Cap, 3D Glasses, Vape, Mole".toSlice();
+        StringUtils.Slice memory arrayString = "Zombie, Cap, 3D Glasses, Vape, Mole".toSlice();
 
-        StringUtils.slice memory zombieSlice = "Zombie".toSlice();
-        StringUtils.slice memory capSlice = "Cap".toSlice();
-        StringUtils.slice memory glassesSlice = "3D Glasses".toSlice();
-        StringUtils.slice memory vapeSlice = "Vape".toSlice();
-        StringUtils.slice memory moleSlice = "Mole".toSlice();
+        StringUtils.Slice memory zombieSlice = "Zombie".toSlice();
+        StringUtils.Slice memory capSlice = "Cap".toSlice();
+        StringUtils.Slice memory glassesSlice = "3D Glasses".toSlice();
+        StringUtils.Slice memory vapeSlice = "Vape".toSlice();
+        StringUtils.Slice memory moleSlice = "Mole".toSlice();
 
-        StringUtils.slice[5] memory attributes = [zombieSlice, capSlice, glassesSlice, vapeSlice, moleSlice];
+        StringUtils.Slice[5] memory attributes = [zombieSlice, capSlice, glassesSlice, vapeSlice, moleSlice];
 
-        StringUtils.slice memory delim = punksBids.ATTRIBUTES_SEPARATOR().toSlice();
+        StringUtils.Slice memory delim = punksBids.ATTRIBUTES_SEPARATOR().toSlice();
 
         for (uint256 i; i < attributes.length; i++) {
             assertEq(attributes[i].equals(arrayString.split(delim)), true, "Check that we retrieved attribute");
@@ -53,7 +53,7 @@ contract String is Base {
         assembly {
             ptr := add(str, 0x20)
         }
-        StringUtils.slice memory s = StringUtils.slice(bytes(str).length, ptr);
+        StringUtils.Slice memory s = StringUtils.Slice(bytes(str).length, ptr);
 
         // assertEq(StringUtils.toSlice(str)._len, s._len, "_len should be correct");
         // assertEq(StringUtils.toSlice(str)._ptr, s._ptr, "_ptr should be correct");
@@ -77,8 +77,8 @@ contract String is Base {
             sentence = string.concat(sentence, noise, str);
         }
 
-        StringUtils.slice memory sentenceSlice = sentence.toSlice();
-        StringUtils.slice memory strSlice = str.toSlice();
+        StringUtils.Slice memory sentenceSlice = sentence.toSlice();
+        StringUtils.Slice memory strSlice = str.toSlice();
 
         uint256 count = sentenceSlice.count(strSlice);
         assertEq(count, occurence, "StringUtils.count()");

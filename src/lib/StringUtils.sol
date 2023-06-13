@@ -34,10 +34,10 @@
  *      corresponding to the left and right parts of the string.
  */
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.19;
 
 library StringUtils {
-    struct slice {
+    struct Slice {
         uint256 _len;
         uint256 _ptr;
     }
@@ -47,12 +47,12 @@ library StringUtils {
      * @param self The string to make a slice from.
      * @return A newly allocated slice containing the entire string.
      */
-    function toSlice(string memory self) internal pure returns (slice memory) {
+    function toSlice(string memory self) internal pure returns (Slice memory) {
         uint256 ptr;
         assembly {
             ptr := add(self, 0x20)
         }
-        return slice(bytes(self).length, ptr);
+        return Slice(bytes(self).length, ptr);
     }
 
     /*
@@ -64,7 +64,7 @@ library StringUtils {
      * @param other The second slice to compare.
      * @return The result of the comparison.
      */
-    function compare(slice memory self, slice memory other) internal pure returns (int256) {
+    function compare(Slice memory self, Slice memory other) internal pure returns (int256) {
         uint256 shortest = self._len;
         if (other._len < self._len) {
             shortest = other._len;
@@ -104,7 +104,7 @@ library StringUtils {
      * @param self The second slice to compare.
      * @return True if the slices are equal, false otherwise.
      */
-    function equals(slice memory self, slice memory other) internal pure returns (bool) {
+    function equals(Slice memory self, Slice memory other) internal pure returns (bool) {
         return compare(self, other) == 0;
     }
 
@@ -237,7 +237,7 @@ library StringUtils {
      * @param token An output parameter to which the first token is written.
      * @return `token`.
      */
-    function split(slice memory self, slice memory needle, slice memory token) internal pure returns (slice memory) {
+    function split(Slice memory self, Slice memory needle, Slice memory token) internal pure returns (Slice memory) {
         uint256 ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr);
         token._ptr = self._ptr;
         token._len = ptr - self._ptr;
@@ -260,7 +260,7 @@ library StringUtils {
      * @param needle The text to search for in `self`.
      * @return The part of `self` up to the first occurrence of `delim`.
      */
-    function split(slice memory self, slice memory needle) internal pure returns (slice memory token) {
+    function split(Slice memory self, Slice memory needle) internal pure returns (Slice memory token) {
         split(self, needle, token);
     }
 
@@ -270,7 +270,7 @@ library StringUtils {
      * @param needle The text to search for in `self`.
      * @return The number of occurrences of `needle` found in `self`.
      */
-    function count(slice memory self, slice memory needle) internal pure returns (uint256 cnt) {
+    function count(Slice memory self, Slice memory needle) internal pure returns (uint256 cnt) {
         uint256 ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr) + needle._len;
         while (ptr <= self._ptr + self._len) {
             cnt++;
@@ -284,7 +284,7 @@ library StringUtils {
      * @param needle The text to search for in `self`.
      * @return True if `needle` is found in `self`, false otherwise.
      */
-    function contains(slice memory self, slice memory needle) internal pure returns (bool) {
+    function contains(Slice memory self, Slice memory needle) internal pure returns (bool) {
         return rfindPtr(self._len, self._ptr, needle._len, needle._ptr) != self._ptr;
     }
 }
