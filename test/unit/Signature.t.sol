@@ -19,7 +19,7 @@ contract Signature is Base {
     function testValidateSignature() public {
         bytes32 bidHash = punksBids.hashBid(bid, nonce);
         bytes32 bidHashToSign = punksBids.hashToSign(bidHash);
-        (uint8 v, bytes32 r, bytes32 s) = signHash(cocoPK, bidHashToSign);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(cocoPK, bidHashToSign);
 
         Input memory input = Input({
             bid: bid,
@@ -37,7 +37,7 @@ contract Signature is Base {
         bytes32 bidHash = punksBids.hashBid(bid, nonce);
         bytes32 bidHashToSign = punksBids.hashToSign(bidHash);
         // Signer != Bidder
-        (uint8 v, bytes32 r, bytes32 s) = signHash(dadaPK, bidHashToSign);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(dadaPK, bidHashToSign);
 
         Input memory input = Input({
             bid: bid,
@@ -57,7 +57,7 @@ contract Signature is Base {
         bytes32 bidHash = punksBids.hashBid(bid, nonce);
         bytes32 bidHashToSign = punksBids.hashToSign(bidHash);
         // Signer != Bidder
-        (uint8 v, bytes32 r, bytes32 s) = signHash(dadaPK, bidHashToSign);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(dadaPK, bidHashToSign);
 
         Input memory input = Input({
             bid: bid,
@@ -75,7 +75,7 @@ contract Signature is Base {
         vm.assume(v != 27 && v != 28);
         bytes32 bidHash = punksBids.hashBid(bid, nonce);
         bytes32 bidHashToSign = punksBids.hashToSign(bidHash);
-        (, bytes32 r, bytes32 s) = signHash(cocoPK, bidHashToSign);
+        (, bytes32 r, bytes32 s) = vm.sign(cocoPK, bidHashToSign);
 
         Input memory input = Input({
             bid: bid,
@@ -88,6 +88,16 @@ contract Signature is Base {
             abi.encodeWithSelector(InvalidVParameter.selector, v)
         );
         punksBids.validateSignature(input, bidHash);
+    }
+
+    function testVerifySignature(uint256 privateKey) public {
+        vm.assume(privateKey > 0 && privateKey <= 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140);
+        address signer = vm.addr(privateKey);
+        bytes32 bidHash = punksBids.hashBid(bid, nonce);
+        bytes32 bidHashToSign = punksBids.hashToSign(bidHash);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, bidHashToSign);
+
+        assertEq(punksBids.verify(signer, bidHashToSign, v, r, s), true, "Signer should be properly recovered");
     }
 }
 

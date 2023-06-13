@@ -39,7 +39,7 @@ contract BuyPunk is Base {
 
         bidHash = punksBids.hashBid(bid, nonce);
         bidHashToSign = punksBids.hashToSign(bidHash);
-        (uint8 v, bytes32 r, bytes32 s) = signHash(cocoPK, bidHashToSign);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(cocoPK, bidHashToSign);
 
         input = Input({
             bid: bid,
@@ -125,7 +125,7 @@ contract BuyPunk is Base {
         bidHash = punksBids.hashBid(bid, nonce);
         bidHashToSign = punksBids.hashToSign(bidHash);
         // Signer != Bidder
-        (uint8 v, bytes32 r, bytes32 s) = signHash(dadaPK, bidHashToSign);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(dadaPK, bidHashToSign);
 
         input = Input({
             bid: bid,

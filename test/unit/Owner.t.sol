@@ -110,6 +110,12 @@ contract Fees is Base {
         emit FeesWithdrawn(dada, balancePunksBids);
         punksBids.withdrawFees(dada);
     }
+
+    // Fallback
+    function testCannotSendETH(uint256 amount) public {
+        vm.expectRevert(NotPayable.selector);
+        payable(revertFallback).call{value: amount}("PunksBids");
+    }
 }
 
 

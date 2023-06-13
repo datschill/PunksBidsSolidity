@@ -57,6 +57,22 @@ contract TestPunksBids is PunksBids {
         _executeBuyPunk(bidder, punkIndex, punkPrice);
     }
 
+    function verify(address signer, bytes32 digest, uint8 v, bytes32 r, bytes32 s)
+        public
+        pure
+        returns (bool)
+    {
+        return _verify(signer, digest, v, r, s);
+    }
+
+    function hashDomain(EIP712Domain memory eip712Domain)
+        public
+        pure
+        returns (bytes32)
+    {
+        return _hashDomain(eip712Domain);
+    }
+
     function hashBid(Bid memory bid, uint256 nonce)
         public
         pure

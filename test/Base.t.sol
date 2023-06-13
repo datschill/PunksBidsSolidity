@@ -48,14 +48,10 @@ contract Base is EIP712, Test {
         deployer = vm.addr(deployerPK);
     }
 
-    function signHash(uint privateKey, bytes32 hash) internal pure returns (uint8 v, bytes32 r, bytes32 s) {
-        (v, r, s) = vm.sign(privateKey, hash);
-    }
-
     function signBid(uint privateKey, Bid memory bid, uint256 nonce) internal view returns (uint8 v, bytes32 r, bytes32 s) {
         bytes32 bidHash = punksBids.hashBid(bid, nonce);
         bytes32 bidHashToSign = punksBids.hashToSign(bidHash);
-        return signHash(privateKey, bidHashToSign);
+        return vm.sign(privateKey, bidHashToSign);
     }
 
     function defaultBid() internal view returns (Bid memory) {
