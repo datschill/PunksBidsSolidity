@@ -178,11 +178,8 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @param recipient The recipient of the fees
      */
     function withdrawFees(address recipient) external onlyOwner {
-        if (recipient == address(0)) {
-            revert TransferToZeroAddress();
-        }
         uint256 amount = address(this).balance;
-        (bool success,) = payable(recipient).call{value: amount}("");
+        (bool success,) = recipient.call{value: amount}("");
         if (!success) {
             revert ETHTransferFailed(recipient);
         }

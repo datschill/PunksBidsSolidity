@@ -73,11 +73,6 @@ contract Fees is Base {
     }
 
     // withdrawFees
-    function testCannotWithdrawToNullAddress() public {
-        vm.expectRevert(TransferToZeroAddress.selector);
-        punksBids.withdrawFees(address(0));
-    }
-
     function testCannotWithdrawToNonPayableAddress() public {
         vm.expectRevert(abi.encodeWithSelector(ETHTransferFailed.selector, address(revertFallback)));
         punksBids.withdrawFees(address(revertFallback));

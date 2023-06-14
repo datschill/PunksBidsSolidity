@@ -8,7 +8,6 @@ error InvalidBidParameters(Bid bid);
 error InvalidSignature(Input input);
 error SenderNotBidder(address sender, address bidder);
 error BidAlreadyCancelledOrFilled(Bid bid);
-error TransferToZeroAddress();
 error ETHTransferFailed(address recipient);
 error InvalidVParameter(uint8 v);
 error InvalidPunkIndex(uint256 punkIndex);
