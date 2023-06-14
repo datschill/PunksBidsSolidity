@@ -381,10 +381,8 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @param price Price to be paid by the bidder
      */
     function _executeWETHTransfer(address bidder, uint256 price) internal {
-        /* Retrieve WETH from bidder. */
         IWETH(WETH).safeTransferFrom(bidder, address(this), price);
 
-        /* WETH -> ETH. */
         IWETH(WETH).withdraw(price);
     }
 
