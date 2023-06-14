@@ -94,7 +94,7 @@ contract EIP712 {
     /**
      * @dev Retrieve hash to be signed
      * @param bidHash Bid hash
-     * @return The EIP712 hash to be signed
+     * @return hash The EIP712 hash to be signed
      */
     function _hashToSign(bytes32 bidHash) internal view returns (bytes32 hash) {
         return keccak256(abi.encodePacked("\x19\x01", _domainSeparator, bidHash));

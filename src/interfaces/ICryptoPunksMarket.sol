@@ -25,7 +25,11 @@ interface ICryptoPunksMarket {
     /**
      * @dev Retrieve Punk sale details
      * @param _punkIndex Punk Index
-     * @return Punk sale status : isForSale, punkIndex, seller : Punk owner, minValue to be paid to buy the Punk, onlySellTo : the only address that could buy the Punk (if not null address)
+     * @return isForSale True if the Punk is for sale
+     * @return punkIndex Punk Index
+     * @return seller Punk Owner
+     * @return minValue Minimum value to be paid to buy the Punk
+     * @return onlySellTo The only address that could buy the Punk (if not null address)
      */
     function punksOfferedForSale(uint256 _punkIndex)
         external

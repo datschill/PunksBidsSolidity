@@ -65,8 +65,7 @@ contract String is Base {
         string memory noise = "delimiter";
 
         vm.assume(
-            occurence != 0
-            && bytes(str).length != 0
+            occurence != 0 && bytes(str).length != 0
                 && (
                     bytes(str).length != bytes(noise).length
                         || keccak256(abi.encodePacked(str)) != keccak256(abi.encodePacked(noise))

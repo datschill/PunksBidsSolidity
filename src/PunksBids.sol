@@ -263,7 +263,9 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @dev Checks that the Punk and the Bid can be matched and get sale parameters
      * @param bid Bid
      * @param punkIndex Punk index
-     * @return Price to be paid by the bidder, punkPrice from the official marketplace and seller address
+     * @return price Price to be paid by the bidder
+     * @return punkPrice Minimum value to be paid to buy the Punk on the official marketplace
+     * @return seller Punk Owner
      */
     function _canMatchBidAndPunk(Bid calldata bid, uint256 punkIndex)
         internal
@@ -331,10 +333,16 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @dev Checks that the Punk can be bought and get sale parameters
      * @param bid Bid
      * @param punkIndex Punk index
-     * @return Price to be paid by the bidder, punkPrice from the official marketplace and seller address
+     * @return price Price to be paid by the bidder
+     * @return punkPrice Minimum value to be paid to buy the Punk on the official marketplace
+     * @return seller Punk Owner
      */
-    function _canBuyPunk(Bid calldata bid, uint256 punkIndex) internal view returns (uint256, uint256, address) {
-        (bool isForSale,, address seller, uint256 punkPrice, address onlySellTo) =
+    function _canBuyPunk(Bid calldata bid, uint256 punkIndex)
+        internal
+        view
+        returns (uint256 price, uint256 punkPrice, address seller)
+    {
+        (bool isForSale,, address owner, uint256 minValue, address onlySellTo) =
             ICryptoPunksMarket(CRYPTOPUNKS_MARKETPLACE).punksOfferedForSale(punkIndex);
 
         if (!isForSale) {
@@ -344,8 +352,11 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
             revert PunkNotGloballyForSale(punkIndex, onlySellTo);
         }
 
+        seller = owner;
+        punkPrice = minValue;
+
         uint16 currentFeeRate = onlySellTo == address(this) ? localFeeRate : feeRate;
-        uint256 price = INVERSE_BASIS_POINT * punkPrice / (INVERSE_BASIS_POINT - currentFeeRate);
+        price = INVERSE_BASIS_POINT * punkPrice / (INVERSE_BASIS_POINT - currentFeeRate);
 
         if (price > bid.amount) {
             revert BidAmountTooLow(price, bid.amount);
@@ -379,7 +390,8 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
             }
         }
 
-        return ((bid.maxIndex == 0 || punkIndex <= bid.maxIndex) && (bid.modulo == 0 || punkIndex % bid.modulo == 0));
+        return (bid.maxIndex == 0 || punkIndex <= bid.maxIndex)
+                && (bid.modulo == 0 || punkIndex % bid.modulo == 0);
     }
 
     /**
