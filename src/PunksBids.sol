@@ -252,11 +252,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
             revert InvalidVParameter(v);
         }
         address recoveredSigner = ecrecover(digest, v, r, s);
-        if (recoveredSigner == address(0)) {
-            return false;
-        } else {
-            return signer == recoveredSigner;
-        }
+        return recoveredSigner != address(0) && signer == recoveredSigner;
     }
 
     /**
