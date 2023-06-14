@@ -6,8 +6,6 @@ import "../Base.t.sol";
 contract Fees is Base {
     event Paused(address account);
     event Unpaused(address account);
-    error EnforcedPause();
-    error ExpectedPause();
 
     event Opened();
     event Closed();
@@ -24,7 +22,7 @@ contract Fees is Base {
 
     // open/close
     function testUnpause() public {
-        vm.expectRevert(ExpectedPause.selector);
+        vm.expectRevert("Pausable: not paused");
         punksBids.unpause();
         // PunksBids need to be paused
         punksBids.pause();
@@ -43,7 +41,7 @@ contract Fees is Base {
 
         assertEq(punksBids.paused(), true, "PunksBids should be paused");
 
-        vm.expectRevert(EnforcedPause.selector);
+        vm.expectRevert("Pausable: paused");
         punksBids.pause();
     }
 

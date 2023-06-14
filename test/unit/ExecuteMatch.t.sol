@@ -4,7 +4,6 @@ pragma solidity 0.8.19;
 import "../Base.t.sol";
 
 contract BuyPunk is Base {
-    error EnforcedPause();
     event BidMatched(address indexed maker, address indexed taker, Bid bid, uint256 price, bytes32 bidHash);
 
     uint256 public nonce;
@@ -48,7 +47,7 @@ contract BuyPunk is Base {
     function testCannotExecuteIfClosed() public {
         punksBids.pause();
 
-        vm.expectRevert(EnforcedPause.selector);
+        vm.expectRevert("Pausable: paused");
         punksBids.executeMatch(input, punkIndex);
     }
 
