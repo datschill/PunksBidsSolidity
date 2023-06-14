@@ -3,6 +3,7 @@ pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "./lib/EIP712.sol";
@@ -21,29 +22,16 @@ import {Input, Bid} from "./lib/BidStructs.sol";
  * @notice Allows bidding with WETH on specific CryptoPunks or attributes
  * @dev Lot of lines of code were taken from the Blur Marketplace, as a source of trust and good architecture example
  */
-contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
+contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Step {
     using SafeERC20 for IWETH;
     using StringUtils for *;
 
-    /* Auth */
-    uint256 public isOpen;
-
-    modifier whenOpen() {
-        if (isOpen != 1) revert PunksBidsClosed();
-        _;
+    function unpause() external onlyOwner {
+        _unpause();
     }
 
-    event Opened();
-    event Closed();
-
-    function open() external onlyOwner {
-        isOpen = 1;
-        emit Opened();
-    }
-
-    function close() external onlyOwner {
-        isOpen = 0;
-        emit Closed();
+    function pause() external onlyOwner {
+        _pause();
     }
 
     /* Constants */
@@ -76,8 +64,6 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
     event LocalFeeRateUpdated(uint256 localFeeRate);
 
     constructor() {
-        isOpen = 1;
-
         _domainSeparator = _hashDomain(
             EIP712Domain({name: NAME, version: VERSION, chainId: block.chainid, verifyingContract: address(this)})
         );
@@ -91,7 +77,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @param buy Buy input
      * @param punkIndex Index of the Punk to be buy on the CryptoPunks Marketplace
      */
-    function executeMatch(Input calldata buy, uint256 punkIndex) external whenOpen nonReentrant {
+    function executeMatch(Input calldata buy, uint256 punkIndex) external whenNotPaused nonReentrant {
         bytes32 bidHash = _hashBid(buy.bid, nonces[buy.bid.bidder]);
 
         if (!_validateBidParameters(buy.bid, bidHash)) {

@@ -4,6 +4,11 @@ pragma solidity 0.8.19;
 import "../Base.t.sol";
 
 contract Fees is Base {
+    event Paused(address account);
+    event Unpaused(address account);
+    error EnforcedPause();
+    error ExpectedPause();
+
     event Opened();
     event Closed();
     event FeesWithdrawn(address indexed recipient, uint256 amount);
@@ -18,20 +23,28 @@ contract Fees is Base {
     }
 
     // open/close
-    function testOpen() public {
-        vm.expectEmit(false, false, false, true);
-        emit Opened();
-        punksBids.open();
+    function testUnpause() public {
+        vm.expectRevert(ExpectedPause.selector);
+        punksBids.unpause();
+        // PunksBids need to be paused
+        punksBids.pause();
 
-        assertEq(punksBids.isOpen(), 1, "PunksBids should be open");
+        vm.expectEmit(false, false, false, true);
+        emit Unpaused(address(this));
+        punksBids.unpause();
+
+        assertEq(punksBids.paused(), false, "PunksBids should be unpaused");
     }
 
-    function testClose() public {
+    function testPause() public {
         vm.expectEmit(false, false, false, true);
-        emit Closed();
-        punksBids.close();
+        emit Paused(address(this));
+        punksBids.pause();
 
-        assertEq(punksBids.isOpen(), 0, "PunksBids should be closed");
+        assertEq(punksBids.paused(), true, "PunksBids should be paused");
+
+        vm.expectRevert(EnforcedPause.selector);
+        punksBids.pause();
     }
 
     // setFeeRate

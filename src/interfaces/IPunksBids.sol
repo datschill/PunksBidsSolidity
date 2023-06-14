@@ -12,9 +12,14 @@ interface IPunksBids {
     function nonces(address wallet) external view returns (uint256);
 
     /**
-     * @dev Close PunksBids smart contract - No bid can be executed while closed
+     * @dev Unpause PunksBids smart contract - bids can only be executed while unpaused
      */
-    function close() external;
+    function unpause() external;
+    
+    /**
+     * @dev Pause PunksBids smart contract - No bid can be executed while paused
+     */
+    function pause() external;
 
     /**
      * @dev Cancel a Bid
