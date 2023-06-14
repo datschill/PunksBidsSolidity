@@ -121,7 +121,7 @@ library StringUtils {
         if (needlelen <= selflen) {
             if (needlelen <= 32) {
                 bytes32 mask;
-                if (needlelen > 0) {
+                if (needlelen != 0) {
                     mask = bytes32(~(2 ** (8 * (32 - needlelen)) - 1));
                 }
 
@@ -180,7 +180,7 @@ library StringUtils {
         if (needlelen <= selflen) {
             if (needlelen <= 32) {
                 bytes32 mask;
-                if (needlelen > 0) {
+                if (needlelen != 0) {
                     mask = bytes32(~(2 ** (8 * (32 - needlelen)) - 1));
                 }
 

@@ -145,8 +145,8 @@ contract CanMatchBidAndPunk is Base {
     }
 
     function testCannotBuyPunkIfIndexIsGreaterThanMaxIndex(uint16 punkIndex, uint16 maxIndex) public {
-        vm.assume(maxIndex > 0);
-        vm.assume(punkIndex > maxIndex);
+        vm.assume(maxIndex != 0);
+        vm.assume(punkIndex != maxIndex);
 
         bid.maxIndex = maxIndex;
 
@@ -156,7 +156,7 @@ contract CanMatchBidAndPunk is Base {
     }
 
     function testCannotBuyPunkIfIndexDoesntFitWithModulo(uint16 punkIndex, uint16 modulo) public {
-        vm.assume(modulo > 0);
+        vm.assume(modulo != 0);
         vm.assume(punkIndex % modulo != 0);
 
         bid.modulo = modulo;
@@ -167,7 +167,7 @@ contract CanMatchBidAndPunk is Base {
     }
 
     function testCannotValidatePunkIndex(uint16 punkIndex, uint16 maxIndex) public {
-        vm.assume(maxIndex > 0);
+        vm.assume(maxIndex != 0);
         vm.assume(punkIndex > maxIndex);
         vm.assume(punkIndex <= 9999);
 

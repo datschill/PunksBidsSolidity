@@ -276,7 +276,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
         StringUtils.Slice[] memory punkAttributes = _getAttributesStringToSliceArray(punkAttributesString);
 
         /* Checks Punk base type. */
-        if (bytes(bid.baseType).length > 0) {
+        if (bytes(bid.baseType).length != 0) {
             StringUtils.Slice memory punkBaseType = punkAttributes[0];
             if (!punkBaseType.contains(bid.baseType.toSlice())) {
                 revert InvalidPunkBaseType();
@@ -293,7 +293,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
         }
 
         /* Compare Bid attributes with Punk attributes. */
-        if (bytes(bid.attributes).length > 0) {
+        if (bytes(bid.attributes).length != 0) {
             StringUtils.Slice memory currentBidAttribute = "".toSlice();
             StringUtils.Slice memory currentPunkAttribute = "".toSlice();
             StringUtils.Slice[] memory bidAttributes = _getAttributesStringToSliceArray(bid.attributes);
@@ -355,7 +355,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      */
     function _validatePunkIndex(Bid calldata bid, uint16 punkIndex) internal pure returns (bool) {
         /* If there is an index list, only checks that punkIndex is in this list. */
-        if (bid.indexes.length > 0) {
+        if (bid.indexes.length != 0) {
             for (uint256 i; i < bid.indexes.length; i++) {
                 if (punkIndex == bid.indexes[i]) {
                     return true;
@@ -364,7 +364,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
             revert PunkNotSelected(punkIndex);
         }
 
-        if (bid.excludedIndexes.length > 0) {
+        if (bid.excludedIndexes.length != 0) {
             for (uint256 i; i < bid.excludedIndexes.length; i++) {
                 if (punkIndex == bid.excludedIndexes[i]) {
                     revert PunkExcluded(punkIndex);

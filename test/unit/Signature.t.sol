@@ -68,7 +68,7 @@ contract Signature is Base {
     }
 
     function testVerifySignature(uint256 privateKey) public {
-        vm.assume(privateKey > 0 && privateKey <= 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140);
+        vm.assume(privateKey != 0 && privateKey <= 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140);
         address signer = vm.addr(privateKey);
         bytes32 bidHash = punksBids.hashBid(bid, nonce);
         bytes32 bidHashToSign = punksBids.hashToSign(bidHash);
