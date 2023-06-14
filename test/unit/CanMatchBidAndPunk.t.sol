@@ -146,7 +146,7 @@ contract CanMatchBidAndPunk is Base {
 
     function testCannotBuyPunkIfIndexIsGreaterThanMaxIndex(uint16 punkIndex, uint16 maxIndex) public {
         vm.assume(maxIndex != 0);
-        vm.assume(punkIndex != maxIndex);
+        vm.assume(punkIndex > maxIndex);
 
         bid.maxIndex = maxIndex;
 
