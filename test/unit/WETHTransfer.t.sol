@@ -7,21 +7,21 @@ contract WETHTransfer is Base {
     uint256 public wethBalance;
 
     function setUp() public {
-        wethBalance = address(weth).balance;
+        wethBalance = address(WETH).balance;
 
-        deal(weth, coco, wethBalance);
+        deal(WETH, coco, wethBalance);
         vm.prank(coco);
-        IWETH(weth).approve(address(punksBids), wethBalance);
+        IWETH(WETH).approve(address(punksBids), wethBalance);
     }
 
     // _executeWETHTransfer
     function testWETHAreWithdrawnFromBidderAndUnwrapedToPunksBids(uint256 amount) public {
         vm.assume(amount <= wethBalance);
 
-        uint256 balanceBefore = IWETH(weth).balanceOf(coco);
+        uint256 balanceBefore = IWETH(WETH).balanceOf(coco);
         uint256 balanceBeforePB = address(punksBids).balance;
         punksBids.executeWETHTransfer(coco, amount);
-        uint256 balanceAfter = IWETH(weth).balanceOf(coco);
+        uint256 balanceAfter = IWETH(WETH).balanceOf(coco);
         uint256 balanceAfterPB = address(punksBids).balance;
 
         assertEq(balanceAfter, balanceBefore - amount, "WETH should have been withdrawn from bidder");

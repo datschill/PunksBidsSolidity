@@ -20,7 +20,12 @@ contract Base is EIP712, Test {
     TestPunksBids internal punksBids;
     ITestCryptoPunksMarket public punksMarketPlace;
 
-    address weth;
+    string internal constant NAME = "PunksBids";
+    string internal constant VERSION = "1.0";
+    address internal constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    address internal constant CRYPTOPUNKS_MARKETPLACE = 0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB;
+    string internal constant ATTRIBUTES_SEPARATOR = ", ";
+
     uint256 internal cocoPK;
     address internal coco;
     uint256 internal dadaPK;
@@ -33,10 +38,7 @@ contract Base is EIP712, Test {
     constructor() {
         revertFallback = new RevertFallback();
         punksBids = new TestPunksBids();
-        punksMarketPlace = ITestCryptoPunksMarket(punksBids.CRYPTOPUNKS_MARKETPLACE());
-        string memory NAME = punksBids.NAME();
-        string memory VERSION = punksBids.VERSION();
-        weth = punksBids.WETH();
+        punksMarketPlace = ITestCryptoPunksMarket(CRYPTOPUNKS_MARKETPLACE);
 
         _domainSeparator = _hashDomain(
             EIP712Domain({name: NAME, version: VERSION, chainId: block.chainid, verifyingContract: address(punksBids)})

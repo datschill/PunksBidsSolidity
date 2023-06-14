@@ -41,7 +41,7 @@ contract String is Base {
 
         StringUtils.Slice[5] memory attributes = [zombieSlice, capSlice, glassesSlice, vapeSlice, moleSlice];
 
-        StringUtils.Slice memory delim = punksBids.ATTRIBUTES_SEPARATOR().toSlice();
+        StringUtils.Slice memory delim = ATTRIBUTES_SEPARATOR.toSlice();
 
         for (uint256 i; i < attributes.length; i++) {
             assertEq(attributes[i].equals(arrayString.split(delim)), true, "Check that we retrieved attribute");

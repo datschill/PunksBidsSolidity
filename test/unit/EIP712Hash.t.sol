@@ -8,9 +8,6 @@ contract EIP712Hash is Base {
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
     function testHashDomain() public {
-        string memory NAME = punksBids.NAME();
-        string memory VERSION = punksBids.VERSION();
-
         bytes32 hashDomainPunksBids = punksBids.hashDomain(
             EIP712Domain({name: NAME, version: VERSION, chainId: block.chainid, verifyingContract: address(punksBids)})
         );

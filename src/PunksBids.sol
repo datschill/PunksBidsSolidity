@@ -47,13 +47,13 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
     }
 
     /* Constants */
-    string public constant NAME = "PunksBids";
-    string public constant VERSION = "1.0";
-    uint256 public constant INVERSE_BASIS_POINT = 1_000; // Fees
-    address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-    address public constant CRYPTOPUNKS_MARKETPLACE = 0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB;
-    address public constant CRYPTOPUNKS_DATA = 0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2;
-    string public constant ATTRIBUTES_SEPARATOR = ", ";
+    string private constant NAME = "PunksBids";
+    string private constant VERSION = "1.0";
+    uint256 private constant INVERSE_BASIS_POINT = 1_000; // Fees
+    address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    address private constant CRYPTOPUNKS_MARKETPLACE = 0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB;
+    address private constant CRYPTOPUNKS_DATA = 0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2;
+    string private constant ATTRIBUTES_SEPARATOR = ", ";
 
     /* Storage */
     mapping(bytes32 => bool) public cancelledOrFilled;
@@ -238,7 +238,6 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
         returns (bool)
     {
         bytes32 hashToSign = _hashToSign(bidHash);
-        // PASHOV QUESTION : Should I use OZ ECDSA instead ? (return ECDSA.recover(bidHash, signature) == signer;)
         return _verify(bidder, hashToSign, v, r, s);
     }
 

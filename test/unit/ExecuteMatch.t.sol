@@ -22,9 +22,9 @@ contract BuyPunk is Base {
 
         nonce = punksBids.nonces(coco);
 
-        deal(weth, coco, bid.amount);
+        deal(WETH, coco, bid.amount);
         vm.prank(coco);
-        IWETH(weth).approve(address(punksBids), bid.amount);
+        IWETH(WETH).approve(address(punksBids), bid.amount);
 
         bidHash = punksBids.hashBid(bid, nonce);
         bidHashToSign = punksBids.hashToSign(bidHash);

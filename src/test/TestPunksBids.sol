@@ -4,6 +4,8 @@ pragma solidity 0.8.19;
 import "src/PunksBids.sol";
 
 contract TestPunksBids is PunksBids {
+    uint256 private constant INVERSE_BASIS_POINT = 1_000;
+
     function validateBidParameters(Bid calldata bid, bytes32 bidHash) public view returns (bool) {
         return _validateBidParameters(bid, bidHash);
     }
