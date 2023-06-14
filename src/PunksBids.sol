@@ -195,15 +195,12 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @param bidHash Hash of bid
      */
     function _validateBidParameters(Bid calldata bid, bytes32 bidHash) internal view returns (bool) {
-        return
         /* Bid must have a bidder. */
-        (
-            (bid.bidder != address(0))
-            /* Bid must not be cancelled or filled. */
-            && (!cancelledOrFilled[bidHash])
-            /* Bid must be settleable. */
-            && (bid.listingTime < block.timestamp) && (block.timestamp < bid.expirationTime)
-        );
+        return bid.bidder != address(0)
+        /* Bid must not be cancelled or filled. */
+        && !cancelledOrFilled[bidHash]
+        /* Bid must be settleable. */
+        && bid.listingTime < block.timestamp && block.timestamp < bid.expirationTime;
     }
 
     /**
