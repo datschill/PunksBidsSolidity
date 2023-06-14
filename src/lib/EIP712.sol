@@ -25,6 +25,11 @@ contract EIP712 {
 
     bytes32 internal _domainSeparator;
 
+    /**
+     * @dev Hash EIP712Domain
+     * @param eip712Domain EIP712Domain struct
+     * @return The hash of eip712Domain
+     */
     function _hashDomain(EIP712Domain memory eip712Domain) internal pure returns (bytes32) {
         return keccak256(
             abi.encode(
@@ -37,6 +42,11 @@ contract EIP712 {
         );
     }
 
+    /**
+     * @dev Hash Bid
+     * @param bid Bid struct
+     * @return The hash of bid
+     */
     function _hashBid(Bid memory bid, uint256 nonce) internal pure returns (bytes32) {
         return keccak256(
             bytes.concat(
@@ -59,18 +69,33 @@ contract EIP712 {
         );
     }
 
+    /**
+     * @dev Hash Bid Indexes
+     * @param bid Bid struct
+     * @return The hash of bid's indexes
+     */
     function _hashIndexes(Bid memory bid) internal pure returns (bytes32) {
         return keccak256(
             abi.encodePacked(keccak256(abi.encodePacked(bid.indexes)), keccak256(abi.encodePacked(bid.excludedIndexes)))
         );
     }
 
+    /**
+     * @dev Hash Bid base type and attributes
+     * @param bid Bid struct
+     * @return The hash of bid's base type and attributes
+     */
     function _hashAttributes(Bid memory bid) internal pure returns (bytes32) {
         return keccak256(
             abi.encodePacked(keccak256(abi.encodePacked(bid.baseType)), keccak256(abi.encodePacked(bid.attributes)))
         );
     }
 
+    /**
+     * @dev Retrieve hash to be signed
+     * @param bidHash Bid hash
+     * @return The EIP712 hash to be signed
+     */
     function _hashToSign(bytes32 bidHash) internal view returns (bytes32 hash) {
         return keccak256(abi.encodePacked("\x19\x01", _domainSeparator, bidHash));
     }

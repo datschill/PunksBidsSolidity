@@ -18,12 +18,14 @@ interface ICryptoPunksMarket {
     /**
      * @dev Retrieve owner address of a Punk
      * @param punkIndex Punk Index
+     * @return The address of the Punk owner
      */
     function punkIndexToAddress(uint256 punkIndex) external view returns (address);
 
     /**
      * @dev Retrieve Punk sale details
      * @param _punkIndex Punk Index
+     * @return Punk sale status : isForSale, punkIndex, seller : Punk owner, minValue to be paid to buy the Punk, onlySellTo : the only address that could buy the Punk (if not null address)
      */
     function punksOfferedForSale(uint256 _punkIndex)
         external

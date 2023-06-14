@@ -193,6 +193,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @dev Verify the validity of the bid parameters
      * @param bid Bid
      * @param bidHash Hash of bid
+     * @return True if Bid parameters are valid
      */
     function _validateBidParameters(Bid calldata bid, bytes32 bidHash) internal view returns (bool) {
         /* Bid must have a bidder. */
@@ -207,6 +208,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @dev Verify the validity of the signature
      * @param bid Bid
      * @param bidHash Hash of bid
+     * @return True if signature matches with Bid or if the msg.sender is the bidder
      */
     function _validateSignature(Input calldata bid, bytes32 bidHash) internal view returns (bool) {
         if (bid.bid.bidder == msg.sender) {
@@ -228,6 +230,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @param v v
      * @param r r
      * @param s s
+     * @return True if signature matches with Bid
      */
     function _validateUserAuthorization(bytes32 bidHash, address bidder, uint8 v, bytes32 r, bytes32 s)
         internal
@@ -246,6 +249,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @param v v
      * @param r r
      * @param s s
+     * @return True if signature of digest originated from signer
      */
     function _verify(address signer, bytes32 digest, uint8 v, bytes32 r, bytes32 s) internal pure returns (bool) {
         if (v != 27 && v != 28) {
@@ -259,6 +263,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @dev Checks that the Punk and the Bid can be matched and get sale parameters
      * @param bid Bid
      * @param punkIndex Punk index
+     * @return Price to be paid by the bidder, punkPrice from the official marketplace and seller address
      */
     function _canMatchBidAndPunk(Bid calldata bid, uint256 punkIndex)
         internal
@@ -326,6 +331,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @dev Checks that the Punk can be bought and get sale parameters
      * @param bid Bid
      * @param punkIndex Punk index
+     * @return Price to be paid by the bidder, punkPrice from the official marketplace and seller address
      */
     function _canBuyPunk(Bid calldata bid, uint256 punkIndex) internal view returns (uint256, uint256, address) {
         (bool isForSale,, address seller, uint256 punkPrice, address onlySellTo) =
@@ -352,6 +358,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @dev Verify the validity of the Punk index
      * @param bid Bid
      * @param punkIndex Punk index
+     * @return True if Punk index matches with Bid parameters
      */
     function _validatePunkIndex(Bid calldata bid, uint16 punkIndex) internal pure returns (bool) {
         /* If there is an index list, only checks that punkIndex is in this list. */
@@ -405,8 +412,9 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
     }
 
     /**
-     * @dev Split a string to an array of strings.slice
+     * @dev Split a string to an array of StringUtils.Slice
      * @param arrayString Array as a string
+     * @return Array of StringUtils.Slice for each attributes in arrayString
      */
     function _getAttributesStringToSliceArray(string memory arrayString)
         internal
