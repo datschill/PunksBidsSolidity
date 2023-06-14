@@ -63,8 +63,8 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @dev feeRate is applied when a Punk wasn't directly offered to PunksBids
      * @dev localFeeRate is applied when a Punk was directly offered to PunksBids
      */
-    uint16 public feeRate = 10;
-    uint16 public localFeeRate = 5;
+    uint256 public feeRate = 10;
+    uint256 public localFeeRate = 5;
 
     /* Events */
     event BidMatched(address indexed maker, address indexed taker, Bid bid, uint256 price, bytes32 bidHash);
@@ -72,8 +72,8 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
     event BidCancelled(bytes32 hash);
     event NonceIncremented(address indexed bidder, uint256 newNonce);
     event FeesWithdrawn(address indexed recipient, uint256 amount);
-    event FeeRateUpdated(uint16 feeRate);
-    event LocalFeeRateUpdated(uint16 localFeeRate);
+    event FeeRateUpdated(uint256 feeRate);
+    event LocalFeeRateUpdated(uint256 localFeeRate);
 
     constructor() {
         isOpen = 1;
@@ -157,7 +157,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @dev Sets a new fee rate
      * @param _feeRate The new fee rate
      */
-    function setFeeRate(uint16 _feeRate) external onlyOwner {
+    function setFeeRate(uint256 _feeRate) external onlyOwner {
         feeRate = _feeRate;
 
         emit FeeRateUpdated(feeRate);
@@ -167,7 +167,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
      * @dev Sets a new local fee rate
      * @param _localFeeRate The new fee rate
      */
-    function setLocalFeeRate(uint16 _localFeeRate) external onlyOwner {
+    function setLocalFeeRate(uint256 _localFeeRate) external onlyOwner {
         localFeeRate = _localFeeRate;
 
         emit LocalFeeRateUpdated(localFeeRate);
@@ -354,7 +354,7 @@ contract PunksBids is IPunksBids, EIP712, ReentrancyGuard, Ownable2Step {
         seller = owner;
         punkPrice = minValue;
 
-        uint16 currentFeeRate = onlySellTo == address(this) ? localFeeRate : feeRate;
+        uint256 currentFeeRate = onlySellTo == address(this) ? localFeeRate : feeRate;
         price = INVERSE_BASIS_POINT * punkPrice / (INVERSE_BASIS_POINT - currentFeeRate);
 
         if (price > bid.amount) {

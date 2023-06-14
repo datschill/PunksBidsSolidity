@@ -64,7 +64,7 @@ contract TestPunksBids is PunksBids {
 
     // PASHOV QUESTION : Is it safe to use this method for tests ?
     function getFinalPrice(uint256 punkPrice, bool isLocal) public view returns (uint256) {
-        uint16 currentFeeRate = isLocal ? localFeeRate : feeRate;
+        uint256 currentFeeRate = isLocal ? localFeeRate : feeRate;
         return INVERSE_BASIS_POINT * punkPrice / (INVERSE_BASIS_POINT - currentFeeRate);
     }
 }

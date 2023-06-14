@@ -7,8 +7,8 @@ contract Fees is Base {
     event Opened();
     event Closed();
     event FeesWithdrawn(address indexed recipient, uint256 amount);
-    event FeeRateUpdated(uint16 feeRate);
-    event LocalFeeRateUpdated(uint16 localFeeRate);
+    event FeeRateUpdated(uint256 feeRate);
+    event LocalFeeRateUpdated(uint256 localFeeRate);
 
     function setUp() public {
         // Give Owner 100 ETH
@@ -35,41 +35,41 @@ contract Fees is Base {
     }
 
     // setFeeRate
-    function testSetFeeRate() public {
-        punksBids.setFeeRate(20);
+    function testSetFeeRate(uint256 feeRate) public {
+        punksBids.setFeeRate(feeRate);
 
-        assertEq(punksBids.feeRate(), 20, "Should have updated feeRate");
+        assertEq(punksBids.feeRate(), feeRate, "Should have updated feeRate");
     }
 
-    function testCannotSetFeeRate() public {
+    function testCannotSetFeeRate(uint256 feeRate) public {
         vm.prank(coco);
         vm.expectRevert("Ownable: caller is not the owner");
-        punksBids.setFeeRate(20);
+        punksBids.setFeeRate(feeRate);
     }
 
-    function testEmitFeeRateUpdated() public {
+    function testEmitFeeRateUpdated(uint256 feeRate) public {
         vm.expectEmit(false, false, false, true);
-        emit FeeRateUpdated(20);
-        punksBids.setFeeRate(20);
+        emit FeeRateUpdated(feeRate);
+        punksBids.setFeeRate(feeRate);
     }
 
     // setLocalFeeRate
-    function testSetLocalFeeRate() public {
-        punksBids.setLocalFeeRate(20);
+    function testSetLocalFeeRate(uint256 locaFeeRate) public {
+        punksBids.setLocalFeeRate(locaFeeRate);
 
-        assertEq(punksBids.localFeeRate(), 20, "Should have updated localFeeRate");
+        assertEq(punksBids.localFeeRate(), locaFeeRate, "Should have updated localFeeRate");
     }
 
-    function testCannotSetLocalFeeRate() public {
+    function testCannotSetLocalFeeRate(uint256 locaFeeRate) public {
         vm.prank(coco);
         vm.expectRevert("Ownable: caller is not the owner");
-        punksBids.setLocalFeeRate(20);
+        punksBids.setLocalFeeRate(locaFeeRate);
     }
 
-    function testEmitLocalFeeRateUpdated() public {
+    function testEmitLocalFeeRateUpdated(uint256 locaFeeRate) public {
         vm.expectEmit(false, false, false, true);
-        emit LocalFeeRateUpdated(20);
-        punksBids.setLocalFeeRate(20);
+        emit LocalFeeRateUpdated(locaFeeRate);
+        punksBids.setLocalFeeRate(locaFeeRate);
     }
 
     // withdrawFees
