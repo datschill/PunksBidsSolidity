@@ -65,7 +65,8 @@ contract String is Base {
         string memory noise = "delimiter";
 
         vm.assume(
-            bytes(str).length != 0
+            occurence != 0
+            && bytes(str).length != 0
                 && (
                     bytes(str).length != bytes(noise).length
                         || keccak256(abi.encodePacked(str)) != keccak256(abi.encodePacked(noise))
@@ -79,8 +80,10 @@ contract String is Base {
 
         StringUtils.Slice memory sentenceSlice = sentence.toSlice();
         StringUtils.Slice memory strSlice = str.toSlice();
+        StringUtils.Slice memory noiseSlice = noise.toSlice();
 
         uint256 count = sentenceSlice.count(strSlice);
-        assertEq(count, occurence, "StringUtils.count()");
+        uint256 countInNoise = noiseSlice.count(strSlice);
+        assertEq(count, occurence + (occurence - 1) * countInNoise, "StringUtils.count()");
     }
 }
