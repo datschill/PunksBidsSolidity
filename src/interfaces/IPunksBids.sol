@@ -15,7 +15,7 @@ interface IPunksBids {
      * @dev Unpause PunksBids smart contract - bids can only be executed while unpaused
      */
     function unpause() external;
-    
+
     /**
      * @dev Pause PunksBids smart contract - No bid can be executed while paused
      */

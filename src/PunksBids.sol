@@ -190,39 +190,13 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
 
     /**
      * @dev Verify the validity of the signature
-     * @param bid Bid
+     * @param input Signed Bid
      * @param bidHash Hash of bid
      * @return True if signature matches with Bid or if the msg.sender is the bidder
      */
-    function _validateSignature(Input calldata bid, bytes32 bidHash) internal view returns (bool) {
-        if (bid.bid.bidder == msg.sender) {
-            return true;
-        }
-
-        /* Check user authorization. */
-        if (!_validateUserAuthorization(bidHash, bid.bid.bidder, bid.v, bid.r, bid.s)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @dev Verify the validity of the user signature
-     * @param bidHash Hash of the Bid
-     * @param bidder Bidder who should be the signer
-     * @param v v
-     * @param r r
-     * @param s s
-     * @return True if signature matches with Bid
-     */
-    function _validateUserAuthorization(bytes32 bidHash, address bidder, uint8 v, bytes32 r, bytes32 s)
-        internal
-        view
-        returns (bool)
-    {
-        bytes32 hashToSign = _hashToSign(bidHash);
-        return _verify(bidder, hashToSign, v, r, s);
+    function _validateSignature(Input calldata input, bytes32 bidHash) internal view returns (bool) {
+        return
+            input.bid.bidder == msg.sender || _verify(input.bid.bidder, _hashToSign(bidHash), input.v, input.r, input.s);
     }
 
     /**
@@ -373,8 +347,7 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
             }
         }
 
-        return (bid.maxIndex == 0 || punkIndex <= bid.maxIndex)
-                && (bid.modulo == 0 || punkIndex % bid.modulo == 0);
+        return (bid.maxIndex == 0 || punkIndex <= bid.maxIndex) && (bid.modulo == 0 || punkIndex % bid.modulo == 0);
     }
 
     /**
