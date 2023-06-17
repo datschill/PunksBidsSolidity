@@ -176,12 +176,8 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
      * @return True if Bid parameters are valid
      */
     function _validateBidParameters(Bid calldata bid, bytes32 bidHash) internal view returns (bool) {
-        /* Bid must have a bidder. */
-        return bid.bidder != address(0)
-        /* Bid must not be cancelled or filled. */
-        && !cancelledOrFilled[bidHash]
-        /* Bid must be settleable. */
-        && bid.listingTime < block.timestamp && block.timestamp < bid.expirationTime;
+        return bid.bidder != address(0) && !cancelledOrFilled[bidHash] && bid.listingTime < block.timestamp
+            && block.timestamp < bid.expirationTime;
     }
 
     /**
@@ -254,7 +250,7 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
             StringUtils.Slice memory currentBidAttribute = "".toSlice();
             StringUtils.Slice memory currentPunkAttribute = "".toSlice();
             StringUtils.Slice[] memory bidAttributes = _getAttributesStringToSliceArray(bid.attributes);
-            uint8 attributeOffset = 1; // We skip base type
+            uint256 attributeOffset = 1; // We skip base type
 
             for (uint256 i; i < bidAttributes.length; i++) {
                 bool hasAttribute = false;
