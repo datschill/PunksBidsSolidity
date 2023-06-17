@@ -278,8 +278,6 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
                 }
             }
         }
-
-        return (price, punkPrice, seller);
     }
 
     /**
@@ -314,8 +312,6 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
         if (price > bid.amount) {
             revert BidAmountTooLow(price, bid.amount);
         }
-
-        return (price, punkPrice, seller);
     }
 
     /**
