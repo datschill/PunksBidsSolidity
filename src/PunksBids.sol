@@ -4,7 +4,6 @@ pragma solidity 0.8.19;
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "./lib/EIP712.sol";
 import "./lib/Errors.sol";
@@ -23,7 +22,6 @@ import {Input, Bid} from "./lib/BidStructs.sol";
  * @dev Lot of lines of code were taken from the Blur Marketplace, as a source of trust and good architecture example
  */
 contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Step {
-    using SafeERC20 for IWETH;
     using StringUtils for *;
 
     function unpause() external onlyOwner {
@@ -385,7 +383,7 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
      * @param price Price to be paid by the bidder
      */
     function _executeWETHTransfer(address bidder, uint256 price) internal {
-        IWETH(WETH).safeTransferFrom(bidder, address(this), price);
+        IWETH(WETH).transferFrom(bidder, address(this), price);
 
         IWETH(WETH).withdraw(price);
     }

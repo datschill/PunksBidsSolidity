@@ -3,7 +3,6 @@ pragma solidity 0.8.19;
 
 import {Bid, Input} from "./BidStructs.sol";
 
-error PunksBidsClosed();
 error InvalidBidParameters(Bid bid);
 error InvalidSignature(Input input);
 error SenderNotBidder(address sender, address bidder);
