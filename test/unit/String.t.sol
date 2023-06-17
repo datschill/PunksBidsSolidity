@@ -73,7 +73,7 @@ contract String is Base {
         );
 
         string memory sentence = "";
-        for (uint8 i; i < occurence; i++) {
+        for (uint256 i; i < occurence; i++) {
             sentence = string.concat(sentence, noise, str);
         }
 

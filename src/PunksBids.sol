@@ -88,7 +88,6 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
 
         (uint256 price, uint256 punkPrice, address seller) = _canMatchBidAndPunk(buy.bid, punkIndex);
 
-        /* Mark bid as filled. */
         cancelledOrFilled[bidHash] = true;
 
         _executeWETHTransfer(buy.bid.bidder, price);
@@ -103,7 +102,6 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
      * @param bid Bid to cancel
      */
     function cancelBid(Bid calldata bid) public {
-        /* Assert sender is authorized to cancel order. */
         if (msg.sender != bid.bidder) {
             revert SenderNotBidder(msg.sender, bid.bidder);
         }
@@ -114,7 +112,6 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
             revert BidAlreadyCancelledOrFilled(bid);
         }
 
-        /* Mark bid as cancelled, preventing it from being matched. */
         cancelledOrFilled[hash] = true;
         emit BidCancelled(hash);
     }
@@ -124,7 +121,7 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
      * @param bids Bids to cancel
      */
     function cancelBids(Bid[] calldata bids) external {
-        for (uint8 i = 0; i < bids.length; i++) {
+        for (uint256 i = 0; i < bids.length; i++) {
             cancelBid(bids[i]);
         }
     }
@@ -259,11 +256,11 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
             StringUtils.Slice[] memory bidAttributes = _getAttributesStringToSliceArray(bid.attributes);
             uint8 attributeOffset = 1; // We skip base type
 
-            for (uint8 i; i < bidAttributes.length; i++) {
+            for (uint256 i; i < bidAttributes.length; i++) {
                 bool hasAttribute = false;
                 currentBidAttribute = bidAttributes[i];
 
-                for (uint8 j = attributeOffset; j < punkAttributes.length; j++) {
+                for (uint256 j = attributeOffset; j < punkAttributes.length; j++) {
                     currentPunkAttribute = punkAttributes[j];
                     if (currentBidAttribute.equals(currentPunkAttribute)) {
                         hasAttribute = true;
