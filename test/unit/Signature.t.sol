@@ -55,18 +55,6 @@ contract Signature is Base {
         assertEq(isValidSignature, false, "Bid signature shouldn't be considered valid if signer != biddder");
     }
 
-    function testVCannotBeInvalid(uint8 v) public {
-        vm.assume(v != 27 && v != 28);
-        bytes32 bidHash = punksBids.hashBid(bid, nonce);
-        bytes32 bidHashToSign = punksBids.hashToSign(bidHash);
-        (, bytes32 r, bytes32 s) = vm.sign(cocoPK, bidHashToSign);
-
-        Input memory input = Input({bid: bid, v: v, r: r, s: s});
-
-        vm.expectRevert(abi.encodeWithSelector(InvalidVParameter.selector, v));
-        punksBids.validateSignature(input, bidHash);
-    }
-
     function testVerifySignature(uint256 privateKey) public {
         vm.assume(privateKey != 0 && privateKey <= 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140);
         address signer = vm.addr(privateKey);

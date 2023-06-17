@@ -208,9 +208,6 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
      * @return True if signature of digest originated from signer
      */
     function _verify(address signer, bytes32 digest, uint8 v, bytes32 r, bytes32 s) internal pure returns (bool) {
-        if (v != 27 && v != 28) {
-            revert InvalidVParameter(v);
-        }
         address recoveredSigner = ecrecover(digest, v, r, s);
         return recoveredSigner != address(0) && signer == recoveredSigner;
     }
