@@ -133,8 +133,7 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
      * @dev Cancel all current bids for a user, preventing them from being matched. Must be called by the bidder
      */
     function incrementNonce() external {
-        nonces[msg.sender] += 1;
-        emit NonceIncremented(msg.sender, nonces[msg.sender]);
+        emit NonceIncremented(msg.sender, ++nonces[msg.sender]);
     }
 
     /**
