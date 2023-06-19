@@ -57,11 +57,17 @@ contract Signature is Base {
 
     function testVerifySignature(uint256 privateKey) public {
         vm.assume(privateKey != 0 && privateKey <= 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140);
+
         address signer = vm.addr(privateKey);
+        bid.bidder = signer;
+        nonce = punksBids.nonces(signer);
+
         bytes32 bidHash = punksBids.hashBid(bid, nonce);
         bytes32 bidHashToSign = punksBids.hashToSign(bidHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, bidHashToSign);
 
-        assertEq(punksBids.verify(signer, bidHashToSign, v, r, s), true, "Signer should be properly recovered");
+        Input memory input = Input({bid: bid, v: v, r: r, s: s});
+
+        assertEq(punksBids.validateSignature(input, bidHash), true, "Signer should be properly recovered");
     }
 }

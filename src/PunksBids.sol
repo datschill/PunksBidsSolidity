@@ -188,21 +188,7 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
      */
     function _validateSignature(Input calldata input, bytes32 bidHash) internal view returns (bool) {
         return
-            input.bid.bidder == msg.sender || _verify(input.bid.bidder, _hashToSign(bidHash), input.v, input.r, input.s);
-    }
-
-    /**
-     * @dev Verify ECDSA signature
-     * @param signer Expected signer
-     * @param digest Signature preimage
-     * @param v v
-     * @param r r
-     * @param s s
-     * @return True if signature of digest originated from signer
-     */
-    function _verify(address signer, bytes32 digest, uint8 v, bytes32 r, bytes32 s) internal pure returns (bool) {
-        address recoveredSigner = ecrecover(digest, v, r, s);
-        return recoveredSigner != address(0) && signer == recoveredSigner;
+            input.bid.bidder == msg.sender || input.bid.bidder == ecrecover(_hashToSign(bidHash), input.v, input.r, input.s);
     }
 
     /**

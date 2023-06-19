@@ -38,10 +38,6 @@ contract TestPunksBids is PunksBids {
         _executeBuyPunk(bidder, punkIndex, punkPrice);
     }
 
-    function verify(address signer, bytes32 digest, uint8 v, bytes32 r, bytes32 s) public pure returns (bool) {
-        return _verify(signer, digest, v, r, s);
-    }
-
     function getAttributesStringToSliceArray(string memory arrayString)
         public
         pure
