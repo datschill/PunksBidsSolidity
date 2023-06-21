@@ -215,8 +215,7 @@ contract PunksBids is IPunksBids, EIP712, Pausable, Ownable2Step {
 
         /* Checks Punk base type. */
         if (bytes(bid.baseType).length != 0) {
-            StringUtils.Slice memory punkBaseType = punkAttributes[0];
-            if (!punkBaseType.contains(bid.baseType.toSlice())) {
+            if (!punkAttributes[0].contains(bid.baseType.toSlice())) {
                 revert InvalidPunkBaseType();
             }
         }
