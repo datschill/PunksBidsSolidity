@@ -12,6 +12,8 @@ contract CanMatchBidAndPunk is Base {
     address public zombieForSalePunkAddress;
     uint256 public alienPunkIndex = 3100;
     address public alienForSalePunkAddress;
+    uint256 public femalePunkIndex = 0;
+    address public femaleForSalePunkAddress;
     uint256 public threeAttributesPunkIndex = 3;
     address public threeAttributesForSalePunkAddress;
 
@@ -42,6 +44,9 @@ contract CanMatchBidAndPunk is Base {
 
         // Init alien punk for sale
         alienForSalePunkAddress = _offerPunkForSale(alienPunkIndex);
+
+        // Init female punk for sale
+        femaleForSalePunkAddress = _offerPunkForSale(femalePunkIndex);
 
         // Init 3 attributes punk for sale
         threeAttributesForSalePunkAddress = _offerPunkForSale(threeAttributesPunkIndex);
@@ -187,6 +192,15 @@ contract CanMatchBidAndPunk is Base {
 
         vm.expectRevert(InvalidPunkBaseType.selector);
         punksBids.canMatchBidAndPunk(bid, alienPunkIndex);
+    }
+
+    function testCannotMatchBidAndPunkIfBaseTypeDoesntMatchMaleFemale() public {
+        string memory baseType = "Male";
+
+        bid.baseType = baseType;
+
+        vm.expectRevert(InvalidPunkBaseType.selector);
+        punksBids.canMatchBidAndPunk(bid, femalePunkIndex);
     }
 
     function testCanMatchBidAndPunkIfBaseTypeMatch() public {
