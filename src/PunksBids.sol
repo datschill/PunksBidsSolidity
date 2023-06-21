@@ -23,11 +23,11 @@ import {Input, Bid} from "./lib/BidStructs.sol";
 contract PunksBids is IPunksBids, EIP712, Pausable, Ownable2Step {
     using StringUtils for *;
 
-    function unpause() external onlyOwner {
+    function unpause() external override onlyOwner {
         _unpause();
     }
 
-    function pause() external onlyOwner {
+    function pause() external override onlyOwner {
         _pause();
     }
 
@@ -74,7 +74,7 @@ contract PunksBids is IPunksBids, EIP712, Pausable, Ownable2Step {
      * @param buy Buy input
      * @param punkIndex Index of the Punk to be buy on the CryptoPunks Marketplace
      */
-    function executeMatch(Input calldata buy, uint256 punkIndex) external whenNotPaused {
+    function executeMatch(Input calldata buy, uint256 punkIndex) external override whenNotPaused {
         bytes32 bidHash = _hashBid(buy.bid, nonces[buy.bid.bidder]);
 
         if (!_validateBidParameters(buy.bid, bidHash)) {
@@ -100,7 +100,7 @@ contract PunksBids is IPunksBids, EIP712, Pausable, Ownable2Step {
      * @dev Cancel a bid, preventing it from being matched. Must be called by the bidder
      * @param bid Bid to cancel
      */
-    function cancelBid(Bid calldata bid) public {
+    function cancelBid(Bid calldata bid) public override {
         if (msg.sender != bid.bidder) {
             revert SenderNotBidder(msg.sender, bid.bidder);
         }
@@ -119,7 +119,7 @@ contract PunksBids is IPunksBids, EIP712, Pausable, Ownable2Step {
      * @dev Cancel multiple bids
      * @param bids Bids to cancel
      */
-    function cancelBids(Bid[] calldata bids) external {
+    function cancelBids(Bid[] calldata bids) external override {
         for (uint256 i = 0; i < bids.length; i++) {
             cancelBid(bids[i]);
         }
@@ -128,7 +128,7 @@ contract PunksBids is IPunksBids, EIP712, Pausable, Ownable2Step {
     /**
      * @dev Cancel all current bids for a user, preventing them from being matched. Must be called by the bidder
      */
-    function incrementNonce() external {
+    function incrementNonce() external override {
         emit NonceIncremented(msg.sender, ++nonces[msg.sender]);
     }
 
