@@ -2,7 +2,6 @@
 pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
 import "./lib/EIP712.sol";
@@ -21,7 +20,7 @@ import {Input, Bid} from "./lib/BidStructs.sol";
  * @notice Allows bidding with WETH on specific CryptoPunks or attributes
  * @dev Lot of lines of code were taken from the Blur Marketplace, as a source of trust and good architecture example
  */
-contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Step {
+contract PunksBids is IPunksBids, EIP712, Pausable, Ownable2Step {
     using StringUtils for *;
 
     function unpause() external onlyOwner {
@@ -75,7 +74,7 @@ contract PunksBids is IPunksBids, EIP712, Pausable, ReentrancyGuard, Ownable2Ste
      * @param buy Buy input
      * @param punkIndex Index of the Punk to be buy on the CryptoPunks Marketplace
      */
-    function executeMatch(Input calldata buy, uint256 punkIndex) external whenNotPaused nonReentrant {
+    function executeMatch(Input calldata buy, uint256 punkIndex) external whenNotPaused {
         bytes32 bidHash = _hashBid(buy.bid, nonces[buy.bid.bidder]);
 
         if (!_validateBidParameters(buy.bid, bidHash)) {
