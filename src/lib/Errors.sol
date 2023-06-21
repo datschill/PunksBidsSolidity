@@ -8,6 +8,7 @@ error InvalidSignature(Input input);
 error SenderNotBidder(address sender, address bidder);
 error BidAlreadyCancelledOrFilled(Bid bid);
 error ETHTransferFailed(address recipient);
+error FeeRateTooHigh(uint256 feeRate);
 error InvalidPunkIndex(uint256 punkIndex);
 error InvalidPunkBaseType();
 error InvalidPunkAttributesCount(uint8 punkAttributesCount, uint8 bidAttributesCount);

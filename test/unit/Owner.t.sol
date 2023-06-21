@@ -47,6 +47,8 @@ contract Fees is Base {
 
     // setFeeRate
     function testSetFeeRate(uint256 feeRate) public {
+        vm.assume(feeRate <= 100);
+
         punksBids.setFeeRate(feeRate);
 
         assertEq(punksBids.feeRate(), feeRate, "Should have updated feeRate");
@@ -58,7 +60,16 @@ contract Fees is Base {
         punksBids.setFeeRate(feeRate);
     }
 
+    function testCannotSetFeeRateTooHigh(uint256 feeRate) public {
+        vm.assume(feeRate > 100);
+
+        vm.expectRevert(abi.encodeWithSelector(FeeRateTooHigh.selector, feeRate));
+        punksBids.setFeeRate(feeRate);
+    }
+
     function testEmitFeeRateUpdated(uint256 feeRate) public {
+        vm.assume(feeRate <= 100);
+
         vm.expectEmit(false, false, false, true);
         emit FeeRateUpdated(feeRate);
         punksBids.setFeeRate(feeRate);
@@ -66,6 +77,8 @@ contract Fees is Base {
 
     // setLocalFeeRate
     function testSetLocalFeeRate(uint256 locaFeeRate) public {
+        vm.assume(locaFeeRate <= 100);
+
         punksBids.setLocalFeeRate(locaFeeRate);
 
         assertEq(punksBids.localFeeRate(), locaFeeRate, "Should have updated localFeeRate");
@@ -76,8 +89,17 @@ contract Fees is Base {
         vm.expectRevert("Ownable: caller is not the owner");
         punksBids.setLocalFeeRate(locaFeeRate);
     }
+    
+    function testCannotSetLocalFeeRateTooHigh(uint256 locaFeeRate) public {
+        vm.assume(locaFeeRate > 100);
+
+        vm.expectRevert(abi.encodeWithSelector(FeeRateTooHigh.selector, locaFeeRate));
+        punksBids.setLocalFeeRate(locaFeeRate);
+    }
 
     function testEmitLocalFeeRateUpdated(uint256 locaFeeRate) public {
+        vm.assume(locaFeeRate <= 100);
+
         vm.expectEmit(false, false, false, true);
         emit LocalFeeRateUpdated(locaFeeRate);
         punksBids.setLocalFeeRate(locaFeeRate);

@@ -35,6 +35,7 @@ contract PunksBids is IPunksBids, EIP712, Pausable, Ownable2Step {
     string private constant NAME = "PunksBids";
     string private constant VERSION = "1.0";
     uint256 private constant INVERSE_BASIS_POINT = 1_000; // Fees
+    uint256 private constant MAX_FEE_RATE = 100;
     address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     address private constant CRYPTOPUNKS_MARKETPLACE = 0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB;
     address private constant CRYPTOPUNKS_DATA = 0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2;
@@ -137,6 +138,10 @@ contract PunksBids is IPunksBids, EIP712, Pausable, Ownable2Step {
      * @param _feeRate The new fee rate
      */
     function setFeeRate(uint256 _feeRate) external onlyOwner {
+        if (_feeRate > MAX_FEE_RATE) {
+            revert FeeRateTooHigh(_feeRate);
+        }
+
         feeRate = _feeRate;
 
         emit FeeRateUpdated(feeRate);
@@ -147,6 +152,10 @@ contract PunksBids is IPunksBids, EIP712, Pausable, Ownable2Step {
      * @param _localFeeRate The new fee rate
      */
     function setLocalFeeRate(uint256 _localFeeRate) external onlyOwner {
+        if (_localFeeRate > MAX_FEE_RATE) {
+            revert FeeRateTooHigh(_localFeeRate);
+        }
+        
         localFeeRate = _localFeeRate;
 
         emit LocalFeeRateUpdated(localFeeRate);
