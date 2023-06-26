@@ -2,6 +2,7 @@
 pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
 import "./lib/EIP712.sol";
@@ -196,7 +197,7 @@ contract PunksBids is IPunksBids, EIP712, Pausable, Ownable2Step {
      */
     function _validateSignature(Input calldata input, bytes32 bidHash) internal view returns (bool) {
         return
-            input.bid.bidder == msg.sender || input.bid.bidder == ecrecover(_hashToSign(bidHash), input.v, input.r, input.s);
+            input.bid.bidder == msg.sender || input.bid.bidder == ECDSA.recover(_hashToSign(bidHash), input.v, input.r, input.s);
     }
 
     /**
