@@ -65,10 +65,7 @@ library StringUtils {
      * @return The result of the comparison.
      */
     function compare(Slice memory self, Slice memory other) internal pure returns (int256) {
-        uint256 shortest = self._len;
-        if (other._len < self._len) {
-            shortest = other._len;
-        }
+        uint256 shortest = (other._len < self._len ? other._len : self._len);
 
         uint256 selfptr = self._ptr;
         uint256 otherptr = other._ptr;
@@ -116,7 +113,6 @@ library StringUtils {
         returns (uint256)
     {
         uint256 ptr = selfptr;
-        uint256 idx;
 
         if (needlelen <= selflen) {
             if (needlelen <= 32) {
@@ -140,7 +136,7 @@ library StringUtils {
                     if (ptr >= end) {
                         return selfptr + selflen;
                     }
-                    ptr++;
+                    ++ptr;
                     assembly {
                         ptrdata := and(mload(ptr), mask)
                     }
@@ -153,7 +149,7 @@ library StringUtils {
                     hash := keccak256(needleptr, needlelen)
                 }
 
-                for (idx = 0; idx <= selflen - needlelen; idx++) {
+                for (uint256 idx; idx <= selflen - needlelen; idx++) {
                     bytes32 testHash;
                     assembly {
                         testHash := keccak256(ptr, needlelen)
@@ -161,7 +157,7 @@ library StringUtils {
                     if (hash == testHash) {
                         return ptr;
                     }
-                    ptr += 1;
+                    ++ptr;
                 }
             }
         }
@@ -199,7 +195,7 @@ library StringUtils {
                     if (ptr <= selfptr) {
                         return selfptr;
                     }
-                    ptr--;
+                    --ptr;
                     assembly {
                         ptrdata := and(mload(ptr), mask)
                     }
@@ -220,7 +216,7 @@ library StringUtils {
                     if (hash == testHash) {
                         return ptr + needlelen;
                     }
-                    ptr -= 1;
+                    --ptr;
                 }
             }
         }
@@ -273,7 +269,7 @@ library StringUtils {
     function count(Slice memory self, Slice memory needle) internal pure returns (uint256 cnt) {
         uint256 ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr) + needle._len;
         while (ptr <= self._ptr + self._len) {
-            cnt++;
+            ++cnt;
             ptr = findPtr(self._len - (ptr - self._ptr), ptr, needle._len, needle._ptr) + needle._len;
         }
     }
