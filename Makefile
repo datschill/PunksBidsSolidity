@@ -3,6 +3,13 @@
 -include .env
 
 #
+#	--- Deployment Scripts ---
+#
+
+deploy-punksbids-goerli:
+	forge script script/DeployTestnet.s.sol:DeployGoerli --rpc-url ${GOERLI_RPC_URL} --broadcast -vvvv
+
+#
 #	--- Scripts TESTs ---
 #
 

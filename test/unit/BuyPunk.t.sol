@@ -14,7 +14,6 @@ contract BuyPunk is Base {
         punksMarketPlace.offerPunkForSale(punkIndex, price);
     }
 
-    // PASHOV QUESTION : Fuzzing : How can I speed tests ?
     // _executeBuyPunk
     function testPunkIsBoughtAndTransferredToBidder(uint256 punkIndex) public {
         vm.assume(punkIndex <= 9999);

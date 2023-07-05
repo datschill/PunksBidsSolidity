@@ -259,7 +259,6 @@ contract PunksBids is IPunksBids, EIP712, Pausable, Ownable2Step {
                     }
                 }
 
-                // PASHOV QUESTION : Remove attributeOffset ? Currently more gas efficient -> but if removed, it can reverts (non matching) if bids aren't properly sorted offchain
                 if (!hasAttribute) {
                     revert PunkMissingAttributes();
                 }
