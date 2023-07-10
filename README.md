@@ -4,16 +4,6 @@ PunksBids is a bidding platform for CryptoPunks, allowing anybody to bid on spec
 
 ---
 
-# On-chain context
-
-```
-DEPLOYMENT: mainnet
-ERC20: WETH
-NFT collection: CryptoPunks 
-```
-
----
-
 # Requirements
 
 Foundry : https://github.com/foundry-rs/foundry
@@ -33,24 +23,10 @@ make unit-tests
 # Test Coverage
 
 ```bash
-forge coverage
+make coverage
 ```
 
 ---
-
-# Audit scope
-
-`src/lib/*`
-
-`src/PunksBids.sol`
-
----
-
-# Contract In Scope
-
-`lib/*` (222 nSLOC)
-
-`PunksBids.sol` (242 nSLOC)
 
 ## Underlying Mechanism
 
@@ -127,14 +103,6 @@ TODO
 `function withdrawFees(address recipient)`
 
 This method is used to withdraw accumulated fees on PunksBids.
-
----
-
-# Solidity Metrics 
-
-lib/* metrics can be found [here](PunksBidsSolidity/solidity-metrics-lib.html)
-
-PunksBids.sol metrics can be found [here](PunksBidsSolidity/solidity-metrics.html)
 
 ---
 
