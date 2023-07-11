@@ -9,9 +9,13 @@ contract Base is Script {
 
     address internal deployerGoerli;
     uint256 internal deployerGoerliPK;
+    address internal deployerMainnet;
+    uint256 internal deployerMainnetPK;
 
     constructor() {
         deployerGoerliPK = vm.envUint("DEPLOYER_PK_GOERLI");
         deployerGoerli = vm.addr(deployerGoerliPK);
+        deployerMainnetPK = vm.envUint("DEPLOYER_PK_MAINNET");
+        deployerMainnet = vm.addr(deployerMainnetPK);
     }
 }
