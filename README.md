@@ -112,8 +112,6 @@ Smart contracts were audited by [pashov](https://twitter.com/pashovkrum).
 
 Audit report can be found [here](https://github.com/pashov/audits/blob/master/solo/PunksBids-security-review.md).
 
-All issues but L-02 were fixed.
-
 ---
 
 # Team & Contacts
