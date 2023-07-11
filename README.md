@@ -110,7 +110,7 @@ This method is used to withdraw accumulated fees on PunksBids.
 
 Smart contracts were audited by [pashov](https://twitter.com/pashovkrum).
 
-Audit report can be found [here](pashov-audit.md).
+Audit report can be found [here](https://github.com/pashov/audits/blob/master/solo/PunksBids-security-review.md).
 
 All issues but L-02 were fixed.
 
